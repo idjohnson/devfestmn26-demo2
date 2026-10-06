@@ -1,0 +1,16 @@
+{
+  "name": "medical-pdf-summarizer",
+  "version": "1.0.0",
+  "description": "Summarize medical PDFs using an Ollama model",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.22.3",
+    "multer": "^2.4.0",
+    "pdf-parse": "^1.1.1"
+  }
+}

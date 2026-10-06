@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Medical PDF Summarizer</title>
+<style>body{font-family:sans-serif;max-width:700px;margin:2rem auto}pre{white-space:pre-wrap}</style></head>
+<body>
+<h1>Medical PDF Summarizer</h1>
+<form id="f"><input type="file" name="pdf" accept="application/pdf" required> <button>Summarize</button></form>
+<p id="status"></p><pre id="out"></pre>
+<p><small>For informational purposes only; not medical advice.</small></p>
+<script>
+const f=document.getElementById('f'),s=document.getElementById('status'),o=document.getElementById('out');
+f.addEventListener('submit',async e=>{e.preventDefault();s.textContent='Summarizing...';o.textContent='';
+try{const r=await fetch('/api/summarize',{method:'POST',body:new FormData(f)});const d=await r.json();
+if(!r.ok)throw new Error(d.error);s.textContent=d.truncated?'Note: document was truncated.':'';o.textContent=d.summary;}
+catch(err){s.textContent='Error: '+err.message;}});
+</script></body></html>
