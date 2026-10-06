@@ -1,0 +1,46 @@
+const express = require('express');
+const multer = require('multer');
+const pdfParse = require('pdf-parse');
+const path = require('path');
+const { summarize } = require('./ollama');
+
+const app = express();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 20 * 1024 * 1024, files: 1 },
+});
+
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+app.post('/api/summarize', upload.single('pdf'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Upload a PDF in the "pdf" field.' });
+  if (req.file.buffer.slice(0, 5).toString() !== '%PDF-') {
+    return res.status(400).json({ error: 'File is not a valid PDF.' });
+  }
+  let text;
+  try {
+    text = (await pdfParse(req.file.buffer)).text.trim();
+  } catch (e) {
+    return res.status(422).json({ error: 'Could not parse the PDF.' });
+  }
+  if (!text) return res.status(422).json({ error: 'No extractable text found in the PDF.' });
+  try {
+    res.json(await summarize(text));
+  } catch (e) {
+    console.error(e);
+    res.status(502).json({ error: 'Failed to get a summary from Ollama.' });
+  }
+});
+
+app.use((err, req, res, next) => {
+  res.status(400).json({ error: err.message });
+});
+
+if (require.main === module) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.log(`Listening on ${port}`));
+}
+
+module.exports = app;
