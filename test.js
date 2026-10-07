@@ -103,7 +103,7 @@ test('health and missing upload', async () => {
   server.close();
 });
 
-test('serves webpage with model options, evaluate button, and download option', async () => {
+test('serves webpage with model options, evaluate button, export PDF, and download option', async () => {
   const server = app.listen(0);
   const base = `http://localhost:${server.address().port}`;
   const res = await fetch(base + '/');
@@ -111,6 +111,8 @@ test('serves webpage with model options, evaluate button, and download option', 
   const html = await res.text();
   assert.match(html, /id="downloadBtn"/);
   assert.match(html, /Download Summary/);
+  assert.match(html, /id="export-pdf-btn"/);
+  assert.match(html, /Export PDF/);
   assert.match(html, /name="mode"/);
   assert.match(html, /value="FAST"\s+selected/);
   assert.match(html, /value="DETAILED"/);

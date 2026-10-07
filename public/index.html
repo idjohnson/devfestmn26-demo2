@@ -17,6 +17,72 @@
     }
     ::-webkit-scrollbar { display: none; }
     #out { white-space: pre-wrap; word-break: break-word; }
+
+    @media print {
+      @page {
+        size: letter portrait;
+        margin: 1.2cm;
+      }
+      body {
+        background: #ffffff !important;
+        color: #111c2d !important;
+        font-size: 11pt !important;
+        line-height: 1.4 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      header,
+      #dropzone,
+      #f,
+      #readyCard,
+      #statusWrapper,
+      #audit-log-modal,
+      #consensus-toast,
+      #actions,
+      #export-pdf-btn,
+      #audit-log-btn,
+      #share-committee-btn,
+      #signoff-modal-btn,
+      #toggleRawBtn,
+      #out,
+      button,
+      nav {
+        display: none !important;
+      }
+      main {
+        padding-top: 0 !important;
+        min-height: auto !important;
+        background: transparent !important;
+      }
+      #assessmentContainer {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.25rem !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .bg-surface-container-lowest,
+      .bg-surface-container-low,
+      .bg-surface-container {
+        background-color: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .text-on-surface,
+      .text-on-surface-variant {
+        color: #0f172a !important;
+      }
+      .text-primary {
+        color: #006194 !important;
+      }
+      a[href]:after {
+        content: none !important;
+      }
+    }
   </style>
   <script src="https://cdn.tailwindcss.com"></script>
   <script id="tailwind-config">
@@ -363,11 +429,15 @@
                 </div>
               </div>
 
-              <!-- Action Bar with Download Button -->
+              <!-- Action Bar with Copy, Export PDF, and Download Button -->
               <div id="actions" class="flex items-center gap-space-xs flex-wrap flex-shrink-0">
                 <button id="copyBtn" type="button" class="h-9 px-space-md rounded bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1 transition-colors shadow-sm">
                   <span class="material-symbols-outlined text-[18px]">content_copy</span>
                   <span>Copy</span>
+                </button>
+                <button id="export-pdf-report-btn" type="button" class="h-9 px-space-md rounded bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1 transition-colors shadow-sm">
+                  <span class="material-symbols-outlined text-[18px] text-primary">picture_as_pdf</span>
+                  <span>Export PDF</span>
                 </button>
                 <button id="downloadBtn" type="button" class="h-9 px-space-md rounded bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1 transition-all shadow-md">
                   <span class="material-symbols-outlined text-[18px]">download</span>
@@ -537,6 +607,8 @@
             actions = document.getElementById('actions'),
             downloadBtn = document.getElementById('downloadBtn'),
             copyBtn = document.getElementById('copyBtn'),
+            exportPdfBtn = document.getElementById('export-pdf-btn'),
+            exportPdfReportBtn = document.getElementById('export-pdf-report-btn'),
             summarizeBtn = document.getElementById('summarizeBtn'),
             evaluateBtn = document.getElementById('evaluateBtn'),
             dropzone = document.getElementById('dropzone'),
@@ -642,6 +714,30 @@
           toggleRawText.textContent = 'Show Raw Text';
         }
       });
+
+      // Export to PDF / Print Handler
+      function exportReportToPdf() {
+        if (!assessmentContainer || assessmentContainer.classList.contains('hidden')) {
+          showToast('Please summarize or evaluate a document first before exporting to PDF.', 'info');
+          return;
+        }
+
+        const oldTitle = document.title;
+        const file = pdfInput && pdfInput.files ? pdfInput.files[0] : null;
+        const baseName = file && file.name ? file.name.replace(/\.[^/.]+$/, '') : 'clinical-report';
+        document.title = `${baseName}-${chosenAction}-report`;
+
+        showToast('Opening print dialog to export PDF...', 'picture_as_pdf');
+        setTimeout(() => {
+          window.print();
+          setTimeout(() => {
+            document.title = oldTitle;
+          }, 1000);
+        }, 200);
+      }
+
+      exportPdfBtn?.addEventListener('click', exportReportToPdf);
+      exportPdfReportBtn?.addEventListener('click', exportReportToPdf);
 
       // Client-side fallback parser for markdown blocks
       function parseStructuredContent(raw, data) {
@@ -931,10 +1027,6 @@
 
       document.getElementById('signoff-modal-btn')?.addEventListener('click', () => {
         showToast('Digital Signature Key Verified (Dr. Sarah Jenkins, MD) - Logged to Audit Trail', 'verified');
-      });
-
-      document.getElementById('export-pdf-btn')?.addEventListener('click', () => {
-        showToast('Generating Publication PDF with GRADE profiles & cryptographic watermark...', 'picture_as_pdf');
       });
 
       document.getElementById('share-committee-btn')?.addEventListener('click', () => {
