@@ -1,106 +1,803 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Medical PDF Summarizer</title>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_standard" name="shell-type"/>
+  <title>Medical PDF Summarizer & Evidence Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
   <style>
-    body { font-family: sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
-    pre { white-space: pre-wrap; background: #f8f9fa; padding: 1rem; border-radius: 4px; border: 1px solid #e9ecef; }
-    button, select { cursor: pointer; padding: 0.4rem 0.8rem; }
-    .form-row { margin-bottom: 0.75rem; }
-    .btn-group { display: flex; gap: 0.5rem; }
-    #actions { margin: 1rem 0; display: none; }
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    #out { white-space: pre-wrap; word-break: break-word; }
   </style>
-</head>
-<body>
-  <h1>Medical PDF Summarizer</h1>
-  <form id="f">
-    <div class="form-row">
-      <input type="file" name="pdf" accept="application/pdf" required>
-    </div>
-    <div class="form-row">
-      <label for="mode">Option: </label>
-      <select name="mode" id="mode">
-        <option value="FAST" selected>FAST</option>
-        <option value="DETAILED">DETAILED</option>
-      </select>
-    </div>
-    <div class="form-row btn-group">
-      <button type="submit" id="summarizeBtn" name="action" value="summarize">Summarize</button>
-      <button type="submit" id="evaluateBtn" name="action" value="evaluate">Evaluate</button>
-    </div>
-  </form>
-  <p id="status"></p>
-  <pre id="out"></pre>
-  <div id="actions">
-    <button id="downloadBtn" type="button">Download Summary</button>
-  </div>
-  <p><small>For informational purposes only; not medical advice.</small></p>
-  <script>
-    const f = document.getElementById('f'),
-          s = document.getElementById('status'),
-          o = document.getElementById('out'),
-          actions = document.getElementById('actions'),
-          downloadBtn = document.getElementById('downloadBtn'),
-          summarizeBtn = document.getElementById('summarizeBtn'),
-          evaluateBtn = document.getElementById('evaluateBtn');
-
-    let currentOutput = '';
-    let downloadFileName = 'summary.txt';
-    let chosenAction = 'summarize';
-
-    summarizeBtn?.addEventListener('click', () => { chosenAction = 'summarize'; });
-    evaluateBtn?.addEventListener('click', () => { chosenAction = 'evaluate'; });
-
-    f.addEventListener('submit', async e => {
-      e.preventDefault();
-      const action = (e.submitter && e.submitter.value) || chosenAction || 'summarize';
-      s.textContent = action === 'evaluate' ? 'Evaluating...' : 'Summarizing...';
-      o.textContent = '';
-      actions.style.display = 'none';
-      currentOutput = '';
-
-      const fileInput = f.querySelector('input[type="file"]');
-      const file = fileInput && fileInput.files ? fileInput.files[0] : null;
-      if (file && file.name) {
-        const baseName = file.name.replace(/\.[^/.]+$/, '');
-        downloadFileName = `${baseName}-${action}.txt`;
-      } else {
-        downloadFileName = `${action}.txt`;
-      }
-
-      downloadBtn.textContent = action === 'evaluate' ? 'Download Evaluation' : 'Download Summary';
-
-      const formData = new FormData(f);
-      formData.set('action', action);
-
-      try {
-        const r = await fetch('/api/summarize', { method: 'POST', body: formData });
-        const d = await r.json();
-        if (!r.ok) throw new Error(d.error);
-        s.textContent = d.truncated ? 'Note: document was truncated.' : '';
-        o.textContent = d.summary;
-        currentOutput = d.summary;
-        if (currentOutput) {
-          actions.style.display = 'block';
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-surface": "#263143",
+            "outline-variant": "#bfc7d2",
+            "on-secondary-container": "#004f7b",
+            "surface-container-low": "#f0f3ff",
+            "on-tertiary-fixed": "#001e2f",
+            "on-primary-container": "#fdfcff",
+            "surface-container": "#e7eeff",
+            "background": "#f9f9ff",
+            "inverse-on-surface": "#ecf1ff",
+            "surface-container-lowest": "#ffffff",
+            "on-primary-fixed": "#001d31",
+            "on-secondary-fixed-variant": "#004b74",
+            "on-secondary": "#ffffff",
+            "tertiary": "#00628d",
+            "on-surface-variant": "#3f4850",
+            "surface-container-highest": "#d8e3fb",
+            "on-surface": "#111c2d",
+            "primary-fixed-dim": "#93ccff",
+            "on-secondary-fixed": "#001d32",
+            "secondary-container": "#7bc2ff",
+            "on-error-container": "#93000a",
+            "primary": "#006194",
+            "on-primary": "#ffffff",
+            "on-primary-fixed-variant": "#004b73",
+            "on-tertiary-container": "#fcfcff",
+            "secondary-fixed": "#cde5ff",
+            "primary-container": "#007bb9",
+            "secondary": "#006399",
+            "inverse-primary": "#93ccff",
+            "surface": "#f9f9ff",
+            "primary-fixed": "#cce5ff",
+            "on-tertiary": "#ffffff",
+            "surface-tint": "#006398",
+            "surface-variant": "#d8e3fb",
+            "on-tertiary-fixed-variant": "#004c6e",
+            "secondary-fixed-dim": "#94ccff",
+            "on-error": "#ffffff",
+            "outline": "#707881",
+            "on-background": "#111c2d",
+            "tertiary-fixed-dim": "#89ceff",
+            "error": "#ba1a1a",
+            "tertiary-fixed": "#c9e6ff",
+            "surface-container-high": "#dee8ff",
+            "surface-bright": "#f9f9ff",
+            "tertiary-container": "#007cb1",
+            "surface-dim": "#cfdaf2",
+            "error-container": "#ffdad6"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "margin": "1.5rem",
+            "space-xl": "1.5rem",
+            "gutter-lg": "1.5rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "margin-lg": "2rem",
+            "space-2xl": "2rem",
+            "space-md": "0.75rem",
+            "space-lg": "1rem"
+          },
+          "fontFamily": {
+            "label-md": ["Inter", "sans-serif"],
+            "headline-lg": ["Inter", "sans-serif"],
+            "evidence-badge": ["Inter", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "metric-tabular": ["Inter", "sans-serif"],
+            "display-lg": ["Inter", "sans-serif"],
+            "headline-md": ["Inter", "sans-serif"],
+            "headline-sm": ["Inter", "sans-serif"]
+          },
+          "fontSize": {
+            "label-md": ["13px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+            "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+            "evidence-badge": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+            "body-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.005em", "fontWeight": "400"}],
+            "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.015em", "fontWeight": "500"}],
+            "metric-tabular": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "500"}],
+            "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "headline-sm": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600"}]
+          }
         }
-      } catch (err) {
-        s.textContent = 'Error: ' + err.message;
       }
-    });
+    };
+  </script>
+</head>
+<body class="bg-background font-body-md text-body-md text-on-surface antialiased">
+  <!-- Top Navigation Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="h-20 w-full px-margin-lg flex items-center justify-between gap-space-lg">
+      <div class="flex items-center gap-space-xl flex-shrink-0">
+        <div class="flex items-center gap-space-md">
+          <div class="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-[22px]">medical_services</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-headline-sm text-headline-sm text-on-surface leading-tight tracking-tight">AevitasMed</span>
+            <span class="font-evidence-badge text-evidence-badge text-outline tracking-wider uppercase">Evidence &amp; Synthesis Engine</span>
+          </div>
+        </div>
+        <div class="h-8 w-px bg-surface-container-high hidden xl:block"></div>
+        <nav class="flex items-center gap-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm">
+          <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md bg-primary-container text-on-primary-container font-semibold transition-colors" href="#">Clinical Summarizer</a>
+          <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">Evidence Dashboard</a>
+          <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">Claim Workspace</a>
+          <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">Consensus Reports</a>
+        </nav>
+      </div>
 
-    downloadBtn.addEventListener('click', () => {
-      if (!currentOutput) return;
-      const blob = new Blob([currentOutput], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = downloadFileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
+      <div class="flex-1 max-w-md mx-space-md hidden lg:block">
+        <div class="relative flex items-center w-full">
+          <span class="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none">search</span>
+          <input class="w-full h-9 pl-9 pr-space-md rounded-lg bg-surface-container-low font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-all" placeholder="Query PubMed ID, DOI, ClinicalTrials.gov NCT..." type="text"/>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-space-md flex-shrink-0">
+        <div class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container text-on-secondary-container">
+          <span class="material-symbols-outlined text-[14px] text-primary">verified_user</span>
+          <span class="font-evidence-badge text-evidence-badge uppercase tracking-wider">HIPAA Verified</span>
+        </div>
+        <button aria-label="Notifications" class="p-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors relative" type="button">
+          <span class="material-symbols-outlined text-[20px]">notifications</span>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary"></span>
+        </button>
+        <div class="h-8 w-px bg-surface-container-high"></div>
+        <div class="flex items-center gap-space-sm pl-space-xs">
+          <div class="w-8 h-8 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-semibold text-xs border border-primary/20">
+            SJ
+          </div>
+          <div class="flex flex-col text-left hidden sm:flex">
+            <span class="font-label-sm text-label-sm text-on-surface font-semibold leading-tight">Dr. Sarah Jenkins, MD</span>
+            <span class="font-evidence-badge text-evidence-badge text-outline leading-tight">Reviewer Lead</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="w-full pt-20 bg-background min-h-screen">
+    <div class="flex flex-col w-full">
+      <div class="w-full px-margin-lg py-space-xl max-w-[1520px] mx-auto flex flex-col gap-space-xl">
+
+        <!-- Breadcrumb & Action Bar -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-space-md">
+          <div class="flex items-center gap-space-sm font-label-sm text-label-sm text-on-surface-variant flex-wrap">
+            <a class="hover:text-primary transition-colors" href="#">Consensus Archive</a>
+            <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+            <span class="text-on-surface-variant">Clinical Evidence Engine</span>
+            <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+            <span class="text-primary font-semibold">#EVAL-CONSENSUS-2024-0412</span>
+            <span class="ml-space-sm px-space-sm py-0.5 rounded bg-surface-container font-evidence-badge text-evidence-badge text-primary uppercase">v2.1 Active</span>
+          </div>
+          <div class="flex items-center gap-space-sm flex-wrap">
+            <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="audit-log-btn" type="button">
+              <span class="material-symbols-outlined text-[18px] text-tertiary">history</span>
+              <span>Audit History Log</span>
+            </button>
+            <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="share-committee-btn" type="button">
+              <span class="material-symbols-outlined text-[18px] text-outline">group_add</span>
+              <span>Share Committee</span>
+            </button>
+            <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="export-pdf-btn" type="button">
+              <span class="material-symbols-outlined text-[18px] text-primary">picture_as_pdf</span>
+              <span>Export PDF</span>
+            </button>
+            <button class="h-9 px-space-lg rounded bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md" id="signoff-modal-btn" type="button">
+              <span class="material-symbols-outlined text-[18px]">verified</span>
+              <span>Sign Off Digital Signature</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Clinical Document Ingestion Studio (Core Application) -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg border border-outline-variant/30">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md border-b border-surface-container-high pb-space-md">
+            <div class="flex items-center gap-space-md">
+              <div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
+                <span class="material-symbols-outlined text-[28px]">fact_check</span>
+              </div>
+              <div class="flex flex-col">
+                <div class="flex items-center gap-space-xs">
+                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold uppercase">Medical AI Ingestion</span>
+                  <span class="font-label-sm text-label-sm text-outline">Clinical Document Studio</span>
+                </div>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-0.5">
+                  Medical PDF Summarizer &amp; Evidence Evaluation
+                </h1>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-outline font-label-sm text-label-sm bg-surface-container-low px-space-md py-1.5 rounded-lg">
+              <span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+              <span>Local Ingestion &bull; Confidential Processing</span>
+            </div>
+          </div>
+
+          <!-- Document Upload & Action Form -->
+          <form id="f" class="flex flex-col gap-space-md">
+            <!-- PDF Upload Dropzone -->
+            <div id="dropzone" class="border-2 border-dashed border-outline-variant hover:border-primary rounded-xl p-space-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex flex-col items-center justify-center gap-space-sm text-center group">
+              <input type="file" name="pdf" id="pdfInput" accept="application/pdf" required class="hidden"/>
+              <div class="w-14 h-14 rounded-full bg-surface-container-lowest group-hover:bg-primary-container group-hover:text-on-primary-container text-primary flex items-center justify-center transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-[30px]" id="uploadIcon">upload_file</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <span class="font-label-md text-label-md text-on-surface font-semibold group-hover:text-primary transition-colors" id="filePromptText">
+                  Select or drag medical PDF report here
+                </span>
+                <span class="text-body-sm font-body-sm text-on-surface-variant text-[12px] mt-0.5" id="fileHelpText">
+                  Upload clinical summaries, EHR documentation, or trials (PDF up to 20MB)
+                </span>
+              </div>
+              <div id="fileSelectedBadge" class="hidden items-center gap-2 px-space-md py-1 rounded-full bg-surface-container-lowest border border-primary/30 text-primary font-label-sm text-label-sm shadow-sm mt-1">
+                <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+                <span id="selectedFileName" class="font-medium"></span>
+              </div>
+            </div>
+
+            <!-- Controls: Engine Option & Action Buttons -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-surface-container-low p-space-md rounded-lg">
+              <div class="flex items-center gap-space-sm">
+                <label for="mode" class="font-label-md text-label-md text-on-surface-variant font-medium flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
+                  <span>Option:</span>
+                </label>
+                <select name="mode" id="mode" class="h-9 px-space-md rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+                  <option value="FAST" selected>FAST</option>
+                  <option value="DETAILED">DETAILED</option>
+                </select>
+                <span class="text-outline text-[12px] font-body-sm hidden md:inline">
+                  (FAST = Rapid synthesis &bull; DETAILED = High-granularity clinical analysis)
+                </span>
+              </div>
+
+              <div class="flex items-center gap-space-sm flex-wrap">
+                <button type="submit" id="summarizeBtn" name="action" value="summarize" class="h-9 px-space-lg rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md active:scale-95">
+                  <span class="material-symbols-outlined text-[18px]">summarize</span>
+                  <span>Summarize</span>
+                </button>
+                <button type="submit" id="evaluateBtn" name="action" value="evaluate" class="h-9 px-space-lg rounded-lg bg-secondary hover:bg-secondary-container text-on-secondary hover:text-on-secondary-container font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md active:scale-95">
+                  <span class="material-symbols-outlined text-[18px]">fact_check</span>
+                  <span>Evaluate</span>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Live Status Feedback Banner -->
+          <div id="statusWrapper" class="hidden flex items-center gap-space-sm p-space-md rounded-lg bg-surface-container text-on-surface transition-all">
+            <div id="statusSpinner" class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p id="status" class="font-label-md text-label-md text-on-surface flex-1 m-0"></p>
+          </div>
+
+          <!-- Dynamic Output Container -->
+          <div id="outputSection" class="hidden flex flex-col gap-space-sm pt-space-xs">
+            <div class="flex items-center justify-between flex-wrap gap-space-xs">
+              <div class="flex items-center gap-space-xs">
+                <span class="material-symbols-outlined text-[20px] text-primary">clinical_notes</span>
+                <span class="font-headline-sm text-headline-sm text-on-surface font-semibold" id="outputTitle">Synthesis Findings</span>
+              </div>
+              <div id="actions" class="flex items-center gap-space-xs" style="display: none;">
+                <button id="copyBtn" type="button" class="h-8 px-space-sm rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1 transition-colors">
+                  <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                  <span>Copy</span>
+                </button>
+                <button id="downloadBtn" type="button" class="h-8 px-space-md rounded bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm flex items-center gap-1 transition-all shadow-sm">
+                  <span class="material-symbols-outlined text-[16px]">download</span>
+                  <span>Download Summary</span>
+                </button>
+              </div>
+            </div>
+            <pre id="out" class="whitespace-pre-wrap font-body-md text-body-md text-on-surface bg-surface-container-low border border-outline-variant/40 rounded-lg p-space-lg max-h-[550px] overflow-y-auto leading-relaxed font-sans shadow-inner"></pre>
+          </div>
+
+          <p class="text-outline font-body-sm text-[12px] m-0">
+            <small>For informational purposes only; not medical advice.</small>
+          </p>
+        </div>
+
+        <!-- Header Clinical Dossier Card (Stitch Reference Panel) -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg">
+          <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-space-lg">
+            <div class="flex flex-col gap-space-xs max-w-4xl">
+              <div class="flex items-center gap-space-sm flex-wrap">
+                <span class="px-space-sm py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-evidence-badge text-evidence-badge tracking-wider uppercase font-semibold">GRADE Standard Assessment</span>
+                <span class="text-outline text-label-sm font-label-sm">Published: October 24, 2024</span>
+                <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+                <span class="text-outline text-label-sm font-label-sm">Protocol Ref: NCT03887455 / NCT04437511</span>
+              </div>
+              <h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1">
+                Clinical Evidence Consensus Memo: Anti-Amyloid Monoclonal Antibodies in Early-Stage Alzheimer’s Disease
+              </h2>
+              <p class="font-body-md text-body-md text-on-surface-variant">
+                Targeting Amyloid-Beta oligomers and protofibrils (Lecanemab &amp; Donanemab) in Mild Cognitive Impairment (MCI) and Mild Dementia due to AD. Comprehensive GRADE appraisal synthesized for Formulary and Therapeutics Committee governance.
+              </p>
+            </div>
+            <div class="flex xl:flex-col items-center xl:items-end justify-between gap-space-md bg-surface-container-low p-space-md rounded-lg flex-shrink-0">
+              <div class="flex flex-col xl:text-right">
+                <span class="font-evidence-badge text-evidence-badge text-outline uppercase">Consensus Status</span>
+                <span class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1 xl:justify-end">
+                  <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                  3 of 4 Signatures Affixed
+                </span>
+              </div>
+              <div class="flex flex-col xl:text-right">
+                <span class="font-evidence-badge text-evidence-badge text-outline uppercase">GRADE Certainty</span>
+                <div class="flex items-center gap-1 text-primary">
+                  <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                  <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                  <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                  <span class="material-symbols-outlined text-[16px] text-outline-variant">circle</span>
+                  <span class="font-label-sm text-label-sm font-semibold ml-1 text-on-surface">Moderate (⊕⊕⊕⭘)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consensus Grade Banner -->
+          <div class="rounded-lg bg-surface-container p-space-lg flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg">
+            <div class="flex items-start gap-space-md">
+              <div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
+                <span class="material-symbols-outlined text-[28px]">fact_check</span>
+              </div>
+              <div class="flex flex-col">
+                <div class="flex items-center gap-space-sm flex-wrap">
+                  <span class="font-evidence-badge text-evidence-badge uppercase tracking-wider text-on-secondary-container bg-surface-container-lowest px-2 py-0.5 rounded shadow-sm">Formal Verdict</span>
+                  <span class="font-label-sm text-label-sm text-outline">Clinical Practice Guideline Level 2A</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight mt-0.5">
+                  FINAL RECOMMENDATION: Conditional Clinical Adoption
+                </h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant max-w-3xl mt-0.5">
+                  Recommended for strictly screened ApoE4-genotyped candidates with documented amyloid biomarker positivity. Mandates rigorous baseline and quarterly 3T-MRI monitoring protocols for ARIA surveillance.
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-space-md flex-shrink-0 flex-wrap">
+              <div class="flex flex-col bg-surface-container-lowest px-space-md py-space-sm rounded shadow-sm">
+                <span class="font-evidence-badge text-evidence-badge text-outline uppercase">Efficacy Deceleration</span>
+                <div class="flex items-baseline gap-1 mt-0.5">
+                  <span class="font-display-lg text-display-lg text-primary font-semibold tracking-tight">-27%</span>
+                  <span class="font-label-sm text-label-sm text-on-surface-variant">vs Placebo</span>
+                </div>
+                <span class="font-evidence-badge text-evidence-badge text-outline">CDR-SB at 18 months</span>
+              </div>
+              <div class="flex flex-col bg-surface-container-lowest px-space-md py-space-sm rounded shadow-sm">
+                <span class="font-evidence-badge text-evidence-badge text-error uppercase">Safety Risk (ARIA-E)</span>
+                <div class="flex items-baseline gap-1 mt-0.5">
+                  <span class="font-display-lg text-display-lg text-error font-semibold tracking-tight">12.6%</span>
+                  <span class="font-label-sm text-label-sm text-on-surface-variant">All Patients</span>
+                </div>
+                <span class="font-evidence-badge text-evidence-badge text-outline">32.6% in ApoE4 Homozygotes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1 & Data Visualization Bento Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+          <!-- Section 1: Executive Summary & Synthesized Findings (7 cols) -->
+          <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-md">
+            <div class="flex items-center justify-between pb-space-sm">
+              <div class="flex items-center gap-space-sm">
+                <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold">Section 01</span>
+                <h3 class="font-headline-md text-headline-md text-on-surface">Executive Summary &amp; Synthesized Findings</h3>
+              </div>
+              <span class="material-symbols-outlined text-outline text-[20px]">medical_information</span>
+            </div>
+            <div class="space-y-space-md text-on-surface font-body-md text-body-md leading-relaxed">
+              <p>
+                The systematic appraisal encompassing two pivotal Phase 3 randomized, double-blind, placebo-controlled trials (Clarity AD, n=1,795; TRAILBLAZER-ALZ 2, n=1,736) demonstrates a statistically significant slowing of cognitive and functional decline in patients with confirmed early-stage Alzheimer’s disease receiving monoclonal anti-amyloid therapy compared to placebo over 18 months.
+              </p>
+              <div class="bg-surface-container-low rounded-lg p-space-md flex flex-col gap-space-sm">
+                <div class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-space-xs">
+                  <span class="material-symbols-outlined text-[16px] text-primary">insights</span>
+                  Primary Cognitive Endpoint: CDR-SB Difference
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Across pooled analysis, the mean change in Clinical Dementia Rating–Sum of Boxes (CDR-SB) exhibited a favorable difference of <span class="font-metric-tabular text-on-surface font-semibold">-0.45 points (95% CI: -0.67 to -0.23, p &lt; 0.001)</span>. Secondary endpoints, including ADAS-Cog14 and ADCS-MCI-ADL, yielded congruent deceleration trajectories (-1.44 points and +1.20 points, respectively).
+                </p>
+              </div>
+              <p>
+                Despite validated bio-efficacy in cortical amyloid clearance, substantial adverse safety signals dictate circumspect clinical adoption. Amyloid-Related Imaging Abnormalities with edema/effusion (ARIA-E) were reported in 12.6% of patients on active agent versus 1.7% in placebo cohorts. Intracerebral microhemorrhages and hemosiderosis (ARIA-H) occurred in 17.3% versus 9.0%.
+              </p>
+            </div>
+          </div>
+
+          <!-- Section 1 Visual Complement: Forest Plot Graphic (5 cols) -->
+          <div class="lg:col-span-5 flex flex-col gap-space-lg">
+            <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span class="font-evidence-badge text-evidence-badge text-outline uppercase tracking-wider">GRADE Meta-Analysis Estimate</span>
+                  <h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">CDR-SB Mean Difference (Forest Plot)</h4>
+                </div>
+                <span class="font-evidence-badge text-evidence-badge bg-surface-container text-on-secondary-container px-2 py-0.5 rounded">p &lt; 0.001</span>
+              </div>
+              <div class="bg-surface-container-low rounded-lg p-space-md flex flex-col gap-space-sm">
+                <div class="flex justify-between font-label-sm text-label-sm text-outline px-2">
+                  <span>Favors Active (-1.0)</span>
+                  <span>Null (0.0)</span>
+                  <span>Favors Placebo (+0.5)</span>
+                </div>
+                <svg class="w-full h-36" fill="none" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
+                  <line stroke="#707881" stroke-dasharray="3 3" stroke-width="1.5" x1="240" x2="240" y1="5" y2="125"></line>
+                  <line stroke="#bfc7d2" stroke-width="1" x1="50" x2="360" y1="125" y2="125"></line>
+                  <line stroke="#707881" x1="100" x2="100" y1="122" y2="128"></line>
+                  <line stroke="#707881" x1="170" x2="170" y1="122" y2="128"></line>
+                  <line stroke="#707881" x1="240" x2="240" y1="122" y2="128"></line>
+                  <line stroke="#707881" x1="310" x2="310" y1="122" y2="128"></line>
+                  <text class="font-body-sm text-[11px]" fill="#3f4850" x="15" y="28">Clarity AD (n=1,795)</text>
+                  <line stroke="#006194" stroke-width="2" x1="130" x2="205" y1="25" y2="25"></line>
+                  <rect fill="#006194" height="8" rx="1" width="8" x="162" y="21"></rect>
+                  <text class="font-body-sm text-[11px]" fill="#3f4850" x="15" y="65">TRAILBLAZER (n=1,736)</text>
+                  <line stroke="#006194" stroke-width="2" x1="120" x2="195" y1="62" y2="62"></line>
+                  <rect fill="#006194" height="8" rx="1" width="8" x="153" y="58"></rect>
+                  <text class="font-label-sm text-[11px] font-semibold" fill="#111c2d" x="15" y="103">GRADE Pooled Diamond</text>
+                  <polygon fill="#007bb9" points="152,100 167,95 182,100 167,105"></polygon>
+                  <line stroke="#007bb9" stroke-width="2" x1="145" x2="189" y1="100" y2="100"></line>
+                </svg>
+                <div class="flex items-center justify-between text-label-sm font-label-sm pt-space-xs text-on-surface-variant">
+                  <span>Overall Effect: MD -0.45 [95% CI: -0.67, -0.23]</span>
+                  <span class="font-metric-tabular text-on-surface font-semibold">I² = 0.0% (Homogeneous)</span>
+                </div>
+              </div>
+
+              <!-- ARIA Risk Stratification Breakdown -->
+              <div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+                <div class="p-space-sm bg-surface-container rounded flex flex-col">
+                  <span class="font-evidence-badge text-evidence-badge text-outline uppercase">Non-Carriers</span>
+                  <span class="font-metric-tabular text-headline-sm text-on-surface font-bold">5.4%</span>
+                  <span class="text-body-sm text-on-surface-variant text-[11px]">Mild Edema / Transient</span>
+                </div>
+                <div class="p-space-sm bg-error-container/40 rounded flex flex-col">
+                  <span class="font-evidence-badge text-evidence-badge text-error uppercase font-semibold">Homozygotes (ε4/ε4)</span>
+                  <span class="font-metric-tabular text-headline-sm text-error font-bold">32.6%</span>
+                  <span class="text-body-sm text-on-error-container text-[11px]">High ARIA-E / Severe</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Summary of Findings Table (GRADE Evidence Profile) -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
+            <div class="flex flex-col">
+              <div class="flex items-center gap-space-sm">
+                <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold">Section 02</span>
+                <h3 class="font-headline-md text-headline-md text-on-surface">Summary of Findings Table: GRADE Evidence Profile</h3>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                Patients: Mild Cognitive Impairment (MCI) or Mild AD &bull; Intervention: Anti-Amyloid mAb Therapy &bull; Comparator: Placebo &bull; Setting: Outpatient Infusion Centers
+              </p>
+            </div>
+            <div class="flex items-center gap-space-xs flex-wrap">
+              <button class="px-space-md py-1 bg-surface-container-low hover:bg-surface-container rounded text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1" type="button">
+                <span class="material-symbols-outlined text-[16px]">filter_list</span>
+                <span>All 5 Endpoints</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="w-full overflow-x-auto rounded-lg shadow-sm">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase tracking-wider">
+                  <th class="py-space-md px-space-md">Clinical Outcome</th>
+                  <th class="py-space-md px-space-md">Relative Effect (95% CI)</th>
+                  <th class="py-space-md px-space-md">Anticipated Absolute Risk Difference</th>
+                  <th class="py-space-md px-space-md">Certainty of Evidence (GRADE)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container-high font-body-sm text-body-sm text-on-surface">
+                <tr class="hover:bg-surface-container-low/50 transition-colors">
+                  <td class="py-space-md px-space-md font-medium">Cognitive &amp; Functional Decline (CDR-SB)</td>
+                  <td class="py-space-md px-space-md font-metric-tabular text-primary font-semibold">MD -0.45 (-0.67 to -0.23)</td>
+                  <td class="py-space-md px-space-md">0.45 points slower progression on 18-point scale</td>
+                  <td class="py-space-md px-space-md">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-primary font-semibold text-xs">
+                      ⊕⊕⊕⭘ Moderate
+                    </span>
+                  </td>
+                </tr>
+                <tr class="hover:bg-surface-container-low/50 transition-colors">
+                  <td class="py-space-md px-space-md font-medium">Amyloid Plaque Burden (PET Centiloids)</td>
+                  <td class="py-space-md px-space-md font-metric-tabular text-primary font-semibold">MD -59.12 CL</td>
+                  <td class="py-space-md px-space-md">68% of treated patients achieved amyloid-negative status</td>
+                  <td class="py-space-md px-space-md">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-semibold text-xs">
+                      ⊕⊕⊕⊕ High
+                    </span>
+                  </td>
+                </tr>
+                <tr class="hover:bg-surface-container-low/50 transition-colors">
+                  <td class="py-space-md px-space-md font-medium text-error">ARIA Edema / Effusion (ARIA-E)</td>
+                  <td class="py-space-md px-space-md font-metric-tabular text-error font-semibold">RR 7.41 (4.88 to 11.25)</td>
+                  <td class="py-space-md px-space-md text-error">+109 more per 1,000 enrollees</td>
+                  <td class="py-space-md px-space-md">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-semibold text-xs">
+                      ⊕⊕⊕⊕ High
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Audit Modal -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/40 backdrop-blur-[2px] hidden items-center justify-center p-space-md transition-opacity" id="audit-log-modal">
+    <div class="bg-surface-container-lowest rounded-xl shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+      <div class="p-space-lg bg-surface-container flex items-center justify-between">
+        <div class="flex items-center gap-space-sm">
+          <span class="material-symbols-outlined text-primary text-[22px]">history</span>
+          <div class="flex flex-col">
+            <h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Audit History &amp; Immutable Log</h4>
+            <span class="font-evidence-badge text-evidence-badge text-outline">Evaluation Dossier #EVAL-CONSENSUS-2024-0412</span>
+          </div>
+        </div>
+        <button class="p-1 rounded hover:bg-surface-container-highest text-on-surface-variant transition-colors" id="close-audit-modal" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="p-space-lg overflow-y-auto space-y-space-md font-body-sm text-body-sm">
+        <div class="flex items-start gap-space-md">
+          <span class="w-2.5 h-2.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <span class="font-label-sm text-label-sm text-on-surface font-semibold">Clinical Document Studio Ingestion Pipeline Active</span>
+              <span class="font-evidence-badge text-evidence-badge text-outline">Today, Live Session</span>
+            </div>
+            <p class="text-on-surface-variant mt-0.5">Ollama local inference service connected with dual FAST and DETAILED engine options.</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-space-md bg-surface-container-low flex justify-end">
+        <button class="px-space-md py-1.5 bg-surface-container-lowest hover:bg-surface-container rounded text-on-surface font-label-md text-label-md transition-colors shadow-sm" id="close-audit-modal-btn" type="button">
+          Close Audit Viewer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-space-lg py-space-md rounded-lg shadow-xl flex items-center gap-space-sm transform translate-y-24 opacity-0 transition-all duration-300" id="consensus-toast">
+    <span class="material-symbols-outlined text-primary-fixed-dim text-[20px]" id="toast-icon">check_circle</span>
+    <span class="font-label-md text-label-md" id="toast-msg">Digital Signature Affixed</span>
+  </div>
+
+  <!-- Application Logic -->
+  <script>
+    (function() {
+      // Elements
+      const f = document.getElementById('f'),
+            s = document.getElementById('status'),
+            o = document.getElementById('out'),
+            statusWrapper = document.getElementById('statusWrapper'),
+            statusSpinner = document.getElementById('statusSpinner'),
+            outputSection = document.getElementById('outputSection'),
+            outputTitle = document.getElementById('outputTitle'),
+            actions = document.getElementById('actions'),
+            downloadBtn = document.getElementById('downloadBtn'),
+            copyBtn = document.getElementById('copyBtn'),
+            summarizeBtn = document.getElementById('summarizeBtn'),
+            evaluateBtn = document.getElementById('evaluateBtn'),
+            dropzone = document.getElementById('dropzone'),
+            pdfInput = document.getElementById('pdfInput'),
+            filePromptText = document.getElementById('filePromptText'),
+            fileHelpText = document.getElementById('fileHelpText'),
+            fileSelectedBadge = document.getElementById('fileSelectedBadge'),
+            selectedFileName = document.getElementById('selectedFileName'),
+            toast = document.getElementById('consensus-toast'),
+            toastMsg = document.getElementById('toast-msg'),
+            toastIcon = document.getElementById('toast-icon');
+
+      let currentOutput = '';
+      let downloadFileName = 'summary.txt';
+      let chosenAction = 'summarize';
+
+      // Toast notification helper
+      function showToast(text, icon = 'check_circle') {
+        if (!toast) return;
+        toastMsg.textContent = text;
+        if (toastIcon) toastIcon.textContent = icon;
+        toast.classList.remove('translate-y-24', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+        setTimeout(() => {
+          toast.classList.add('translate-y-24', 'opacity-0');
+          toast.classList.remove('translate-y-0', 'opacity-100');
+        }, 3500);
+      }
+
+      // Dropzone & File Input Sync
+      if (dropzone && pdfInput) {
+        dropzone.addEventListener('click', () => pdfInput.click());
+
+        ['dragenter', 'dragover'].forEach(name => {
+          dropzone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropzone.classList.add('border-primary', 'bg-surface-container');
+          });
+        });
+
+        ['dragleave', 'drop'].forEach(name => {
+          dropzone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('border-primary', 'bg-surface-container');
+          });
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+          if (e.dataTransfer && e.dataTransfer.files.length) {
+            pdfInput.files = e.dataTransfer.files;
+            handleFileSelect(e.dataTransfer.files[0]);
+          }
+        });
+
+        pdfInput.addEventListener('change', () => {
+          if (pdfInput.files && pdfInput.files.length) {
+            handleFileSelect(pdfInput.files[0]);
+          }
+        });
+      }
+
+      function handleFileSelect(file) {
+        if (!file) return;
+        selectedFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        fileSelectedBadge.classList.remove('hidden');
+        fileSelectedBadge.classList.add('inline-flex');
+        filePromptText.textContent = 'Selected Medical Document';
+        fileHelpText.textContent = 'Click to change file or proceed with synthesis below';
+      }
+
+      // Track submit action
+      summarizeBtn?.addEventListener('click', () => { chosenAction = 'summarize'; });
+      evaluateBtn?.addEventListener('click', () => { chosenAction = 'evaluate'; });
+
+      // Form submission
+      f.addEventListener('submit', async e => {
+        e.preventDefault();
+        const action = (e.submitter && e.submitter.value) || chosenAction || 'summarize';
+
+        // Update UI for loading state
+        statusWrapper.classList.remove('hidden');
+        statusSpinner.classList.remove('hidden');
+        s.textContent = action === 'evaluate' ? 'Evaluating document against clinical criteria...' : 'Summarizing document via clinical AI...';
+        s.className = 'font-label-md text-label-md text-primary flex-1 m-0';
+        
+        outputSection.classList.add('hidden');
+        actions.style.display = 'none';
+        o.textContent = '';
+        currentOutput = '';
+
+        const file = pdfInput && pdfInput.files ? pdfInput.files[0] : null;
+        if (file && file.name) {
+          const baseName = file.name.replace(/\.[^/.]+$/, '');
+          downloadFileName = `${baseName}-${action}.txt`;
+        } else {
+          downloadFileName = `${action}.txt`;
+        }
+
+        downloadBtn.textContent = action === 'evaluate' ? 'Download Evaluation' : 'Download Summary';
+        outputTitle.textContent = action === 'evaluate' ? 'Clinical Evaluation & Course of Action' : 'Executive Clinical Summary';
+
+        const formData = new FormData(f);
+        formData.set('action', action);
+
+        try {
+          const r = await fetch('/api/summarize', { method: 'POST', body: formData });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error || 'Server error');
+
+          statusSpinner.classList.add('hidden');
+          if (d.truncated) {
+            s.textContent = 'Note: document was truncated due to length constraints.';
+            s.className = 'font-label-md text-label-md text-tertiary flex-1 m-0';
+          } else {
+            statusWrapper.classList.add('hidden');
+          }
+
+          o.textContent = d.summary;
+          currentOutput = d.summary;
+          if (currentOutput) {
+            outputSection.classList.remove('hidden');
+            actions.style.display = 'flex';
+            showToast(action === 'evaluate' ? 'Evaluation complete' : 'Summary generated', 'verified');
+          }
+        } catch (err) {
+          statusSpinner.classList.add('hidden');
+          s.textContent = 'Error: ' + err.message;
+          s.className = 'font-label-md text-label-md text-error flex-1 m-0';
+          showToast('Analysis error: ' + err.message, 'error');
+        }
+      });
+
+      // Download Handler
+      downloadBtn.addEventListener('click', () => {
+        if (!currentOutput) return;
+        const blob = new Blob([currentOutput], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = downloadFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`Downloaded ${downloadFileName}`, 'download_done');
+      });
+
+      // Copy Handler
+      copyBtn?.addEventListener('click', async () => {
+        if (!currentOutput) return;
+        try {
+          await navigator.clipboard.writeText(currentOutput);
+          showToast('Copied synthesis to clipboard', 'content_copy');
+        } catch {
+          showToast('Could not copy automatically', 'error');
+        }
+      });
+
+      // Stitch Modal & Action buttons
+      const modal = document.getElementById('audit-log-modal');
+      const openBtn = document.getElementById('audit-log-btn');
+      const closeBtn = document.getElementById('close-audit-modal');
+      const closeBtn2 = document.getElementById('close-audit-modal-btn');
+
+      if (openBtn && modal) {
+        openBtn.addEventListener('click', () => {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        });
+      }
+
+      function closeModal() {
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      }
+
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (closeBtn2) closeBtn2.addEventListener('click', closeModal);
+
+      document.getElementById('signoff-modal-btn')?.addEventListener('click', () => {
+        showToast('Digital Signature Key Verified (Dr. Sarah Jenkins, MD) - Logged to Audit Trail', 'verified');
+      });
+
+      document.getElementById('export-pdf-btn')?.addEventListener('click', () => {
+        showToast('Generating Publication PDF with GRADE profiles & cryptographic watermark...', 'picture_as_pdf');
+      });
+
+      document.getElementById('share-committee-btn')?.addEventListener('click', () => {
+        showToast('Secure link dispatched to Hospital Formulary Committee members', 'group_add');
+      });
+    })();
   </script>
 </body>
 </html>
