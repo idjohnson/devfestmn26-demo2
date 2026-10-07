@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const { extractPdfText } = require('./pdf');
 const path = require('path');
-const { summarize } = require('./ollama');
+const { summarize, evaluate } = require('./ollama');
 
 const app = express();
 const upload = multer({
@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-app.post('/api/summarize', upload.single('pdf'), async (req, res) => {
+async function handlePdfRequest(req, res, defaultAction = 'summarize') {
   if (!req.file) return res.status(400).json({ error: 'Upload a PDF in the "pdf" field.' });
   if (req.file.buffer.slice(0, 5).toString() !== '%PDF-') {
     return res.status(400).json({ error: 'File is not a valid PDF.' });
@@ -29,12 +29,19 @@ app.post('/api/summarize', upload.single('pdf'), async (req, res) => {
   }
   if (!text) return res.status(422).json({ error: 'No extractable text found in the PDF.' });
   try {
-    res.json(await summarize(text));
+    const rawMode = (req.body?.mode || req.query?.mode || '').toString().trim().toUpperCase();
+    const mode = rawMode === 'DETAILED' ? 'DETAILED' : 'FAST';
+    const rawAction = (req.body?.action || req.query?.action || defaultAction).toString().trim().toLowerCase();
+    const action = rawAction === 'evaluate' ? 'evaluate' : 'summarize';
+    res.json(await summarize(text, mode, action));
   } catch (e) {
     console.error(e);
-    res.status(502).json({ error: 'Failed to get a summary from Ollama.' });
+    res.status(502).json({ error: `Failed to get a ${defaultAction} from Ollama.` });
   }
-});
+}
+
+app.post('/api/summarize', upload.single('pdf'), (req, res) => handlePdfRequest(req, res, 'summarize'));
+app.post('/api/evaluate', upload.single('pdf'), (req, res) => handlePdfRequest(req, res, 'evaluate'));
 
 app.use((err, req, res, next) => {
   res.status(400).json({ error: err.message });

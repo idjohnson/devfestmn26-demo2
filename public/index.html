@@ -6,15 +6,29 @@
   <style>
     body { font-family: sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
     pre { white-space: pre-wrap; background: #f8f9fa; padding: 1rem; border-radius: 4px; border: 1px solid #e9ecef; }
-    button { cursor: pointer; padding: 0.4rem 0.8rem; }
+    button, select { cursor: pointer; padding: 0.4rem 0.8rem; }
+    .form-row { margin-bottom: 0.75rem; }
+    .btn-group { display: flex; gap: 0.5rem; }
     #actions { margin: 1rem 0; display: none; }
   </style>
 </head>
 <body>
   <h1>Medical PDF Summarizer</h1>
   <form id="f">
-    <input type="file" name="pdf" accept="application/pdf" required>
-    <button type="submit">Summarize</button>
+    <div class="form-row">
+      <input type="file" name="pdf" accept="application/pdf" required>
+    </div>
+    <div class="form-row">
+      <label for="mode">Option: </label>
+      <select name="mode" id="mode">
+        <option value="FAST" selected>FAST</option>
+        <option value="DETAILED">DETAILED</option>
+      </select>
+    </div>
+    <div class="form-row btn-group">
+      <button type="submit" id="summarizeBtn" name="action" value="summarize">Summarize</button>
+      <button type="submit" id="evaluateBtn" name="action" value="evaluate">Evaluate</button>
+    </div>
   </form>
   <p id="status"></p>
   <pre id="out"></pre>
@@ -27,35 +41,47 @@
           s = document.getElementById('status'),
           o = document.getElementById('out'),
           actions = document.getElementById('actions'),
-          downloadBtn = document.getElementById('downloadBtn');
+          downloadBtn = document.getElementById('downloadBtn'),
+          summarizeBtn = document.getElementById('summarizeBtn'),
+          evaluateBtn = document.getElementById('evaluateBtn');
 
-    let currentSummary = '';
+    let currentOutput = '';
     let downloadFileName = 'summary.txt';
+    let chosenAction = 'summarize';
+
+    summarizeBtn?.addEventListener('click', () => { chosenAction = 'summarize'; });
+    evaluateBtn?.addEventListener('click', () => { chosenAction = 'evaluate'; });
 
     f.addEventListener('submit', async e => {
       e.preventDefault();
-      s.textContent = 'Summarizing...';
+      const action = (e.submitter && e.submitter.value) || chosenAction || 'summarize';
+      s.textContent = action === 'evaluate' ? 'Evaluating...' : 'Summarizing...';
       o.textContent = '';
       actions.style.display = 'none';
-      currentSummary = '';
+      currentOutput = '';
 
       const fileInput = f.querySelector('input[type="file"]');
       const file = fileInput && fileInput.files ? fileInput.files[0] : null;
       if (file && file.name) {
         const baseName = file.name.replace(/\.[^/.]+$/, '');
-        downloadFileName = `${baseName}-summary.txt`;
+        downloadFileName = `${baseName}-${action}.txt`;
       } else {
-        downloadFileName = 'summary.txt';
+        downloadFileName = `${action}.txt`;
       }
 
+      downloadBtn.textContent = action === 'evaluate' ? 'Download Evaluation' : 'Download Summary';
+
+      const formData = new FormData(f);
+      formData.set('action', action);
+
       try {
-        const r = await fetch('/api/summarize', { method: 'POST', body: new FormData(f) });
+        const r = await fetch('/api/summarize', { method: 'POST', body: formData });
         const d = await r.json();
         if (!r.ok) throw new Error(d.error);
         s.textContent = d.truncated ? 'Note: document was truncated.' : '';
         o.textContent = d.summary;
-        currentSummary = d.summary;
-        if (currentSummary) {
+        currentOutput = d.summary;
+        if (currentOutput) {
           actions.style.display = 'block';
         }
       } catch (err) {
@@ -64,8 +90,8 @@
     });
 
     downloadBtn.addEventListener('click', () => {
-      if (!currentSummary) return;
-      const blob = new Blob([currentSummary], { type: 'text/plain;charset=utf-8' });
+      if (!currentOutput) return;
+      const blob = new Blob([currentOutput], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

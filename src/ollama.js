@@ -1,23 +1,38 @@
 const OLLAMA_URL = () => (process.env.OLLAMA_URL || 'http://localhost:11434').replace(/\/+$/, '');
-const OLLAMA_MODEL = () => process.env.OLLAMA_MODEL || 'llama3.1';
+const OLLAMA_MODEL_FAST = () => process.env.OLLAMA_MODEL_FAST || process.env.OLLAMA_MODEL || 'gemma4:e4b';
+const OLLAMA_MODEL_DETAILED = () => process.env.OLLAMA_MODEL_DETAILED || 'medgemma1.5:4b';
 const MAX_CHARS = () => parseInt(process.env.MAX_CHARS || '24000', 10);
 
-function buildPrompt(text) {
+function getModel(mode) {
+  const normalized = (mode || '').toString().trim().toUpperCase();
+  if (normalized === 'DETAILED') {
+    return OLLAMA_MODEL_DETAILED();
+  }
+  return OLLAMA_MODEL_FAST();
+}
+
+function buildPrompt(text, action = 'summarize') {
+  const instruction = action === 'evaluate'
+    ? 'Evaluate the results and suggest next courses of action for the patient.  Note the user that this was AI generated'
+    : 'Only use information present in the document; say "Not stated" otherwise. Do not give medical advice.';
+
   return (
     'You are a careful assistant that summarizes medical documents for a patient. ' +
     'Summarize the document below with these sections: Overview, Key Findings, ' +
-    'Diagnoses/Conditions, Medications, Recommended Follow-up. Only use information ' +
-    'present in the document; say "Not stated" otherwise. Do not give medical advice.\n\n' +
+    'Diagnoses/Conditions, Medications, Recommended Follow-up. ' +
+    instruction + '\n\n' +
     '--- DOCUMENT ---\n' + text + '\n--- END ---'
   );
 }
 
-async function summarize(text) {
+async function summarize(text, mode = 'FAST', action = 'summarize') {
   const clipped = text.slice(0, MAX_CHARS());
+  const model = getModel(mode);
+  const prompt = buildPrompt(clipped, action);
   const res = await fetch(`${OLLAMA_URL()}/api/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: OLLAMA_MODEL(), prompt: buildPrompt(clipped), stream: true }),
+    body: JSON.stringify({ model, prompt, stream: true }),
   });
   if (!res.ok) {
     throw new Error(`Ollama returned ${res.status}: ${await res.text()}`);
@@ -53,4 +68,8 @@ async function summarize(text) {
   return { summary: fullResponse, truncated: text.length > clipped.length };
 }
 
-module.exports = { summarize, buildPrompt };
+async function evaluate(text, mode = 'FAST') {
+  return summarize(text, mode, 'evaluate');
+}
+
+module.exports = { summarize, evaluate, buildPrompt, getModel };
