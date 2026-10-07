@@ -1,0 +1,113 @@
+# Default values for medical-pdf-summarizer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: medical-pdf-summarizer
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Whether to run the pod on the host network (similar to docker --network host)
+hostNetwork: false
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  # Container runs as non-root node user (UID 1000 in Dockerfile)
+  # runAsNonRoot: true
+  # runAsUser: 1000
+  # allowPrivilegeEscalation: false
+  # readOnlyRootFilesystem: false
+
+# Application environment configuration
+app:
+  # Port on which the application listens inside the container
+  port: 3001
+  ollama:
+    # URL to the Ollama endpoint (e.g., host IP or k8s service)
+    url: "http://192.168.1.220:11434"
+    # Ollama model used for fast summary
+    modelFast: "gemma4:12b"
+    # Ollama model used for detailed medical summary/evaluation
+    modelDetailed: "medgemma:27b"
+  # Maximum characters from the PDF sent to Ollama
+  maxChars: 24000
+  # Additional environment variables passed to the container
+  extraEnv: []
+
+service:
+  type: ClusterIP
+  port: 3001
+  # targetPort overrides the backend container port if specified
+  targetPort: evalhttp
+  # nodePort: 30001 # Set when type is NodePort
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: medical-pdf-summarizer.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: medical-pdf-summarizer-tls
+  #    hosts:
+  #      - medical-pdf-summarizer.local
+
+resources: {}
+  # limits:
+  #   cpu: 1000m
+  #   memory: 1Gi
+  # requests:
+  #   cpu: 100m
+  #   memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: evalhttp
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: evalhttp
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 2
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
