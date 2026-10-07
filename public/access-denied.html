@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Access Required | AevitasMed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: #f9f9ff; --surface: #ffffff; --on-surface: #111c2d; --on-surface-variant: #3f4850;
+      --outline: #707881; --primary: #006194; --on-primary: #ffffff; --container-low: #f0f3ff; --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+      font-family: 'Inter', system-ui, sans-serif; font-size: 14px; line-height: 20px;
+      color: var(--on-surface); background: var(--background); -webkit-font-smoothing: antialiased;
+    }
+    .card {
+      width: 100%; max-width: 28rem; padding: 2rem; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+      background: var(--surface); border: 1px solid rgba(191, 199, 210, 0.3); border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+    }
+    .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal;
+      line-height: 1; letter-spacing: normal; text-transform: none; white-space: nowrap; }
+    .logo {
+      width: 4rem; height: 4rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center;
+      background: var(--primary); color: var(--on-primary); box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
+    }
+    .logo .material-symbols-outlined { font-size: 36px; }
+    .brand h1 { margin: 0.25rem 0 0; font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: -0.015em; }
+    .brand span { display: block; margin-top: 2px; font-size: 11px; line-height: 14px; font-weight: 600;
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--outline); }
+    .notice {
+      width: 100%; padding: 1rem; display: flex; gap: 0.75rem; text-align: left;
+      background: var(--container-low); border: 1px solid var(--border); border-radius: 0.5rem;
+    }
+    .notice .material-symbols-outlined { font-size: 20px; color: var(--primary); flex-shrink: 0; margin-top: 2px; }
+    .notice h2 { margin: 0 0 0.25rem; font-size: 16px; line-height: 24px; font-weight: 600; letter-spacing: -0.005em; }
+    .notice p { margin: 0; font-size: 13px; line-height: 18px; color: var(--on-surface-variant); }
+    .btn {
+      width: 100%; height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      font: 500 13px 'Inter', sans-serif; text-decoration: none; color: var(--on-surface);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 0.25rem; transition: all .15s;
+    }
+    .btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .btn:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; }
+    .btn .material-symbols-outlined { font-size: 18px; }
+    .trust { display: flex; align-items: center; gap: 0.35rem; font-size: 12px; color: var(--outline); }
+    .trust .material-symbols-outlined { font-size: 16px; color: var(--primary); }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="logo"><span class="material-symbols-outlined">medical_services</span></div>
+    <div class="brand">
+      <h1>AevitasMed</h1>
+      <span>Evidence &amp; Synthesis Engine</span>
+    </div>
+
+    <div class="notice" role="status">
+      <span class="material-symbols-outlined">lock_person</span>
+      <div>
+        <h2>Thank you for your interest in AevitasMed</h2>
+        <p>We're excited that you want to explore the Evidence &amp; Synthesis Engine. Your account has not been
+           approved for access yet. Please reach out to your AevitasMed representative to gain access.</p>
+      </div>
+    </div>
+
+    <a class="btn" href="/auth/logout">
+      <span class="material-symbols-outlined">arrow_back</span>
+      <span>Return to sign in</span>
+    </a>
+
+    <div class="trust">
+      <span class="material-symbols-outlined">verified_user</span>
+      <span>Access is limited to approved clinicians</span>
+    </div>
+  </main>
+</body>
+</html>

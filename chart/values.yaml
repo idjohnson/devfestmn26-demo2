@@ -60,6 +60,8 @@ app:
     clientSecret: ""
     redirectUri: "http://localhost:3001/auth/callback"
   sessionSecret: ""
+  # Emails allowed to sign in (case-insensitive); [] or ["*"] allows any authenticated user
+  allowedUsers: []
   # Additional environment variables passed to the container
   extraEnv: []
 

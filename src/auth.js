@@ -6,6 +6,18 @@ const GOOGLE_CLIENT_SECRET = () => process.env.GOOGLE_CLIENT_SECRET || '';
 const GOOGLE_REDIRECT_URI = () => process.env.GOOGLE_REDIRECT_URI || '';
 const SESSION_SECRET = () => process.env.SESSION_SECRET || 'dev-insecure-session-secret-change-in-prod';
 
+// Comma/whitespace-separated emails; empty or "*" means no restriction.
+const allowedUsers = () => (process.env.ALLOWED_USERS || '')
+  .split(/[\s,]+/)
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
+function isUserAllowed(email) {
+  const list = allowedUsers();
+  if (list.length === 0 || list.includes('*')) return true;
+  return list.includes(String(email || '').trim().toLowerCase());
+}
+
 const GOOGLE_AUTH_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
 const GOOGLE_USERINFO_ENDPOINT = 'https://openidconnect.googleapis.com/v1/userinfo';
@@ -145,6 +157,16 @@ function attachAuthRoutes(app) {
         return res.redirect('/?auth_error=userinfo_failed');
       }
 
+      if (!profile.email_verified || !isUserAllowed(profile.email)) {
+        console.warn('Access denied for', profile.email);
+        res.setHeader('Set-Cookie', cookie.serialize('oauth_state', '', {
+          httpOnly: true,
+          maxAge: 0,
+          path: '/',
+        }));
+        return res.redirect('/access-denied.html');
+      }
+
       const sessionToken = signSession({
         sub: profile.sub,
         name: profile.name || profile.email || 'Clinician',
@@ -177,6 +199,10 @@ function attachAuthRoutes(app) {
   app.post('/auth/dev-login', (req, res) => {
     const name = (req.body && req.body.name) || 'Dr. Isaac Johnson, MD';
     const email = (req.body && req.body.email) || 'isaac.johnson@hospital.org';
+
+    if (!isUserAllowed(email)) {
+      return res.status(403).json({ error: 'access_denied' });
+    }
 
     const sessionToken = signSession({
       sub: 'dev-user-123',
@@ -212,6 +238,7 @@ module.exports = {
   verifySession,
   getUserFromRequest,
   attachAuthRoutes,
+  isUserAllowed,
   GOOGLE_AUTH_ENDPOINT,
   GOOGLE_TOKEN_ENDPOINT,
   GOOGLE_USERINFO_ENDPOINT,

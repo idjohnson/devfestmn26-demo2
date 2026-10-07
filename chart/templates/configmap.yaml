@@ -14,3 +14,4 @@ data:
   GOOGLE_CLIENT_SECRET: {{ .Values.app.google.clientSecret | quote }}
   GOOGLE_REDIRECT_URI: {{ .Values.app.google.redirectUri | quote }}
   SESSION_SECRET: {{ .Values.app.sessionSecret | quote }}
+  ALLOWED_USERS: {{ join "," .Values.app.allowedUsers | quote }}
