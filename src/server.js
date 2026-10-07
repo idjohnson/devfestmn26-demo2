@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const pdfParse = require('pdf-parse');
+const { extractPdfText } = require('./pdf');
 const path = require('path');
 const { summarize } = require('./ollama');
 
@@ -21,9 +21,11 @@ app.post('/api/summarize', upload.single('pdf'), async (req, res) => {
   }
   let text;
   try {
-    text = (await pdfParse(req.file.buffer)).text.trim();
+    const result = await extractPdfText(req.file.buffer);
+    text = result.text;
   } catch (e) {
-    return res.status(422).json({ error: 'Could not parse the PDF.' });
+    console.error('PDF extraction error:', e);
+    return res.status(422).json({ error: `Could not parse the PDF: ${e.message}` });
   }
   if (!text) return res.status(422).json({ error: 'No extractable text found in the PDF.' });
   try {

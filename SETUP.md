@@ -5,6 +5,7 @@ A Node.js app that uploads a medical PDF, extracts its text, and asks an Ollama 
 ## Prerequisites
 - An Ollama endpoint with a model pulled, e.g. `ollama pull llama3.1`
 - Node.js 20+ (local run) or Docker
+- If running locally without Docker, `poppler-utils` (`pdftoppm`) and `tesseract-ocr` are required for OCR fallback on scanned documents (e.g. `sudo apt install poppler-utils tesseract-ocr tesseract-ocr-eng`). In Docker, these are pre-installed.
 
 ## Configuration (env vars)
 | Variable | Default | Purpose |

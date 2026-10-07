@@ -17,13 +17,40 @@ async function summarize(text) {
   const res = await fetch(`${OLLAMA_URL()}/api/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: OLLAMA_MODEL(), prompt: buildPrompt(clipped), stream: false }),
+    body: JSON.stringify({ model: OLLAMA_MODEL(), prompt: buildPrompt(clipped), stream: true }),
   });
   if (!res.ok) {
     throw new Error(`Ollama returned ${res.status}: ${await res.text()}`);
   }
-  const data = await res.json();
-  return { summary: data.response, truncated: text.length > clipped.length };
+
+  let fullResponse = '';
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let lineBuffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    lineBuffer += decoder.decode(value, { stream: true });
+    const lines = lineBuffer.split('\n');
+    lineBuffer = lines.pop(); // keep trailing incomplete line
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      try {
+        const data = JSON.parse(line);
+        if (data.response) fullResponse += data.response;
+      } catch {}
+    }
+  }
+
+  if (lineBuffer.trim()) {
+    try {
+      const data = JSON.parse(lineBuffer);
+      if (data.response) fullResponse += data.response;
+    } catch {}
+  }
+
+  return { summary: fullResponse, truncated: text.length > clipped.length };
 }
 
 module.exports = { summarize, buildPrompt };
