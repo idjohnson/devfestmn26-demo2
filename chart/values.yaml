@@ -54,6 +54,12 @@ app:
     modelDetailed: "medgemma:27b"
   # Maximum characters from the PDF sent to Ollama
   maxChars: 24000
+  # Google OAuth settings; supply real values via --set or a private values file, not git
+  google:
+    clientId: ""
+    clientSecret: ""
+    redirectUri: "http://localhost:3001/auth/callback"
+  sessionSecret: ""
   # Additional environment variables passed to the container
   extraEnv: []
 

@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const { buildPrompt, getModel, parseMarkdownOrText } = require('./src/ollama');
+const { signSession, verifySession } = require('./src/auth');
 const app = require('./src/server');
 
 test('prompt includes document text', () => {
@@ -94,6 +95,30 @@ test('getModel respects environment variables', () => {
   }
 });
 
+test('signSession and verifySession handle HMAC signature verification correctly', () => {
+  const payload = { sub: 'user_456', name: 'Dr. Jane Doe', email: 'jane@example.com' };
+  const token = signSession(payload, 'test-secret');
+  assert.ok(token.includes('.'));
+
+  // Valid verification
+  const verified = verifySession(token, 'test-secret');
+  assert.strictEqual(verified.sub, 'user_456');
+  assert.strictEqual(verified.name, 'Dr. Jane Doe');
+  assert.strictEqual(verified.email, 'jane@example.com');
+
+  // Wrong secret
+  assert.strictEqual(verifySession(token, 'wrong-secret'), null);
+
+  // Tampered payload
+  const [b64Payload, sig] = token.split('.');
+  const tamperedPayload = Buffer.from(JSON.stringify({ sub: 'user_tampered', name: 'Attacker' })).toString('base64url');
+  assert.strictEqual(verifySession(`${tamperedPayload}.${sig}`, 'test-secret'), null);
+
+  // Invalid formats
+  assert.strictEqual(verifySession('', 'test-secret'), null);
+  assert.strictEqual(verifySession('invalid.format.extra', 'test-secret'), null);
+});
+
 test('health and missing upload', async () => {
   const server = app.listen(0);
   const base = `http://localhost:${server.address().port}`;
@@ -103,21 +128,114 @@ test('health and missing upload', async () => {
   server.close();
 });
 
-test('serves webpage with model options, evaluate button, export PDF, and download option', async () => {
+test('serves webpage with Google login, user header, model options, evaluate, export PDF, and download option', async () => {
   const server = app.listen(0);
   const base = `http://localhost:${server.address().port}`;
   const res = await fetch(base + '/');
   assert.strictEqual(res.status, 200);
   const html = await res.text();
-  assert.match(html, /id="downloadBtn"/);
+
+  // Authentication UI elements
+  assert.match(html, /id=\"loginView\"/);
+  assert.match(html, /id=\"googleSignInBtn\"/);
+  assert.match(html, /Sign in with Google/);
+  assert.match(html, /id=\"userNameDisplay\"/);
+  assert.match(html, /href=\"\/auth\/logout\"/);
+
+  // App features
+  assert.match(html, /id=\"downloadBtn\"/);
   assert.match(html, /Download Summary/);
-  assert.match(html, /id="export-pdf-btn"/);
+  assert.match(html, /id=\"export-pdf-btn\"/);
   assert.match(html, /Export PDF/);
-  assert.match(html, /name="mode"/);
-  assert.match(html, /value="FAST"\s+selected/);
-  assert.match(html, /value="DETAILED"/);
-  assert.match(html, /id="summarizeBtn"/);
-  assert.match(html, /id="evaluateBtn"/);
+  assert.match(html, /name=\"mode\"/);
+  assert.match(html, /value=\"FAST\"\s+selected/);
+  assert.match(html, /value=\"DETAILED\"/);
+  assert.match(html, /id=\"summarizeBtn\"/);
+  assert.match(html, /id=\"evaluateBtn\"/);
   assert.match(html, /Evaluate/);
+  server.close();
+});
+
+test('/api/auth/me returns unauthenticated status without session cookie', async () => {
+  const server = app.listen(0);
+  const base = `http://localhost:${server.address().port}`;
+  const res = await fetch(base + '/api/auth/me');
+  assert.strictEqual(res.status, 200);
+  const body = await res.json();
+  assert.strictEqual(body.authenticated, false);
+  assert.strictEqual(body.user, null);
+  assert.strictEqual(typeof body.idpConfigured, 'boolean');
+  server.close();
+});
+
+test('/api/auth/me returns authenticated user with valid session cookie', async () => {
+  const server = app.listen(0);
+  const base = `http://localhost:${server.address().port}`;
+  const sessionToken = signSession({
+    sub: 'google-sub-789',
+    name: 'Dr. Sarah Connor, MD',
+    email: 'sconnor@hospital.org'
+  });
+
+  const res = await fetch(base + '/api/auth/me', {
+    headers: {
+      Cookie: `session=${sessionToken}`
+    }
+  });
+  assert.strictEqual(res.status, 200);
+  const body = await res.json();
+  assert.strictEqual(body.authenticated, true);
+  assert.strictEqual(body.user.name, 'Dr. Sarah Connor, MD');
+  assert.strictEqual(body.user.email, 'sconnor@hospital.org');
+  server.close();
+});
+
+test('/auth/dev-login sets session cookie and returns user data', async () => {
+  const server = app.listen(0);
+  const base = `http://localhost:${server.address().port}`;
+  const res = await fetch(base + '/auth/dev-login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Dr. Test Clinician', email: 'test@hospital.org' })
+  });
+  assert.strictEqual(res.status, 200);
+  const cookieHeader = res.headers.get('set-cookie');
+  assert.ok(cookieHeader && cookieHeader.includes('session='));
+  const body = await res.json();
+  assert.strictEqual(body.status, 'ok');
+  assert.strictEqual(body.user.name, 'Dr. Test Clinician');
+  server.close();
+});
+
+test('/auth/google redirects to error when IdP not configured, or to Google endpoint when configured', async () => {
+  const server = app.listen(0);
+  const base = `http://localhost:${server.address().port}`;
+
+  // When unconfigured:
+  const resUnconfigured = await fetch(base + '/auth/google', { redirect: 'manual' });
+  assert.strictEqual(resUnconfigured.status, 302);
+  assert.match(resUnconfigured.headers.get('location'), /auth_error=idp_not_configured/);
+
+  // When configured:
+  const origClientId = process.env.GOOGLE_CLIENT_ID;
+  const origClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  process.env.GOOGLE_CLIENT_ID = 'test-client-id.apps.googleusercontent.com';
+  process.env.GOOGLE_CLIENT_SECRET = 'test-client-secret';
+
+  try {
+    const resConfigured = await fetch(base + '/auth/google', { redirect: 'manual' });
+    assert.strictEqual(resConfigured.status, 302);
+    const location = resConfigured.headers.get('location');
+    assert.match(location, /^https:\/\/accounts\.google\.com\/o\/oauth2\/v2\/auth\?/);
+    assert.match(location, /client_id=test-client-id\.apps\.googleusercontent\.com/);
+    assert.match(location, /scope=openid\+email\+profile/);
+  } finally {
+    if (origClientId !== undefined) process.env.GOOGLE_CLIENT_ID = origClientId;
+    else delete process.env.GOOGLE_CLIENT_ID;
+
+    if (origClientSecret !== undefined) process.env.GOOGLE_CLIENT_SECRET = origClientSecret;
+    else delete process.env.GOOGLE_CLIENT_SECRET;
+  }
+
   server.close();
 });

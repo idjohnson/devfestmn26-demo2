@@ -10,3 +10,7 @@ data:
   OLLAMA_MODEL_FAST: {{ .Values.app.ollama.modelFast | quote }}
   OLLAMA_MODEL_DETAILED: {{ .Values.app.ollama.modelDetailed | quote }}
   MAX_CHARS: {{ .Values.app.maxChars | default 24000 | quote }}
+  GOOGLE_CLIENT_ID: {{ .Values.app.google.clientId | quote }}
+  GOOGLE_CLIENT_SECRET: {{ .Values.app.google.clientSecret | quote }}
+  GOOGLE_REDIRECT_URI: {{ .Values.app.google.redirectUri | quote }}
+  SESSION_SECRET: {{ .Values.app.sessionSecret | quote }}

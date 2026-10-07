@@ -34,6 +34,7 @@
         padding: 0 !important;
       }
       header,
+      #loginView,
       #dropzone,
       #f,
       #readyCard,
@@ -189,408 +190,481 @@
   </script>
 </head>
 <body class="bg-background font-body-md text-body-md text-on-surface antialiased">
-  <!-- Top Navigation Header -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-    <div class="h-20 w-full px-margin-lg flex items-center justify-between gap-space-lg">
-      <div class="flex items-center gap-space-xl flex-shrink-0">
-        <div class="flex items-center gap-space-md">
-          <div class="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-sm">
-            <span class="material-symbols-outlined text-[22px]">medical_services</span>
-          </div>
-          <div class="flex flex-col">
-            <span class="font-headline-sm text-headline-sm text-on-surface leading-tight tracking-tight">AevitasMed</span>
-            <span class="font-evidence-badge text-evidence-badge text-outline tracking-wider uppercase">Evidence &amp; Synthesis Engine</span>
-          </div>
-        </div>
-        <div class="h-8 w-px bg-surface-container-high hidden xl:block"></div>
-        <nav class="flex items-center gap-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm">
-          <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md bg-primary-container text-on-primary-container font-semibold transition-colors" href="#">Clinical Summarizer</a>
-          <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">Evidence Dashboard</a>
-          <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">Claim Workspace</a>
-          <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">Consensus Reports</a>
-        </nav>
-      </div>
 
-      <div class="flex-1 max-w-md mx-space-md hidden lg:block">
-        <div class="relative flex items-center w-full">
-          <span class="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none">search</span>
-          <input class="w-full h-9 pl-9 pr-space-md rounded-lg bg-surface-container-low font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-all" placeholder="Query PubMed ID, DOI, ClinicalTrials.gov NCT..." type="text"/>
+  <!-- Initial Federated IdP Login View (Shown when not authenticated) -->
+  <div id="loginView" class="min-h-screen w-full flex flex-col items-center justify-center p-space-lg bg-background">
+    <div class="w-full max-w-md bg-surface-container-lowest rounded-2xl shadow-xl p-space-2xl border border-outline-variant/30 flex flex-col items-center text-center gap-space-lg">
+      <!-- Logo & Clinical Branding -->
+      <div class="flex flex-col items-center gap-space-sm">
+        <div class="w-16 h-16 rounded-2xl bg-primary text-on-primary flex items-center justify-center shadow-md">
+          <span class="material-symbols-outlined text-[36px]">medical_services</span>
+        </div>
+        <div class="flex flex-col items-center mt-1">
+          <h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">AevitasMed</h1>
+          <span class="font-evidence-badge text-evidence-badge text-outline tracking-wider uppercase mt-0.5">Evidence &amp; Synthesis Engine</span>
         </div>
       </div>
 
-      <div class="flex items-center gap-space-md flex-shrink-0">
-        <div class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container text-on-secondary-container">
-          <span class="material-symbols-outlined text-[14px] text-primary">verified_user</span>
-          <span class="font-evidence-badge text-evidence-badge uppercase tracking-wider">HIPAA Verified</span>
-        </div>
-        <button aria-label="Notifications" class="p-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors relative" type="button">
-          <span class="material-symbols-outlined text-[20px]">notifications</span>
-          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary"></span>
-        </button>
-        <div class="h-8 w-px bg-surface-container-high"></div>
-        <div class="flex items-center gap-space-sm pl-space-xs">
-          <div class="w-8 h-8 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-semibold text-xs border border-primary/20">
-            SJ
-          </div>
-          <div class="flex flex-col text-left hidden sm:flex">
-            <span class="font-label-sm text-label-sm text-on-surface font-semibold leading-tight">Dr. Sarah Jenkins, MD</span>
-            <span class="font-evidence-badge text-evidence-badge text-outline leading-tight">Reviewer Lead</span>
-          </div>
+      <div class="flex flex-col gap-1.5">
+        <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Clinician Access Portal</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm">
+          Sign in via institutional Google federated OIDC to access confidential medical record summarization and GRADE evidence synthesis.
+        </p>
+      </div>
+
+      <!-- Auth Error Notification (if redirected with error) -->
+      <div id="loginErrorAlert" class="hidden w-full p-space-md rounded-lg bg-error-container/40 border border-error/30 text-error font-body-sm text-body-sm text-left flex items-start gap-2">
+        <span class="material-symbols-outlined text-[18px] text-error flex-shrink-0 mt-0.5">error</span>
+        <span id="loginErrorText" class="flex-1"></span>
+      </div>
+
+      <!-- Federated Sign In Button -->
+      <div class="w-full flex flex-col gap-space-sm">
+        <a href="/auth/google" id="googleSignInBtn" class="flex items-center justify-center gap-3 w-full h-12 px-6 rounded-xl bg-surface-container-lowest border border-[#dadce0] hover:bg-[#f8fafd] hover:border-primary shadow-sm hover:shadow transition-all text-[#3c4043] font-medium text-sm group">
+          <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span class="font-medium tracking-normal text-[14px] text-on-surface group-hover:text-primary transition-colors">Sign in with Google</span>
+        </a>
+
+        <!-- Dev Mode / Demo Sign-in fallback for local testing without Google credentials -->
+        <div id="demoLoginContainer" class="hidden flex flex-col gap-2 pt-2 border-t border-surface-container-high w-full">
+          <span class="text-[12px] text-outline">IdP credentials not configured. Use demo clinician account for testing:</span>
+          <button id="devLoginBtn" type="button" class="w-full h-10 px-4 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md flex items-center justify-center gap-2 border border-primary/20 transition-all">
+            <span class="material-symbols-outlined text-[18px]">badge</span>
+            <span>Sign in as Dr. Isaac Johnson, MD (Demo)</span>
+          </button>
         </div>
       </div>
-    </div>
-  </header>
 
-  <!-- Main Content Area -->
-  <main class="w-full pt-20 bg-background min-h-screen">
-    <div class="flex flex-col w-full">
-      <div class="w-full px-margin-lg py-space-xl max-w-[1520px] mx-auto flex flex-col gap-space-xl">
-
-        <!-- Breadcrumb & Action Bar -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-space-md">
-          <div class="flex items-center gap-space-sm font-label-sm text-label-sm text-on-surface-variant flex-wrap">
-            <a class="hover:text-primary transition-colors" href="#">Consensus Archive</a>
-            <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
-            <span class="text-on-surface-variant">Clinical Evidence Engine</span>
-            <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
-            <span class="text-primary font-semibold" id="topDossierRef">#EVAL-CLINICAL-ACTIVE</span>
-            <span class="ml-space-sm px-space-sm py-0.5 rounded bg-surface-container font-evidence-badge text-evidence-badge text-primary uppercase" id="topStatusPill">Live Engine</span>
-          </div>
-          <div class="flex items-center gap-space-sm flex-wrap">
-            <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="audit-log-btn" type="button">
-              <span class="material-symbols-outlined text-[18px] text-tertiary">history</span>
-              <span>Audit History Log</span>
-            </button>
-            <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="share-committee-btn" type="button">
-              <span class="material-symbols-outlined text-[18px] text-outline">group_add</span>
-              <span>Share Committee</span>
-            </button>
-            <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="export-pdf-btn" type="button">
-              <span class="material-symbols-outlined text-[18px] text-primary">picture_as_pdf</span>
-              <span>Export PDF</span>
-            </button>
-            <button class="h-9 px-space-lg rounded bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md" id="signoff-modal-btn" type="button">
-              <span class="material-symbols-outlined text-[18px]">verified</span>
-              <span>Sign Off Digital Signature</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Interactive Clinical Document Ingestion Studio (Core Application) -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg border border-outline-variant/30">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md border-b border-surface-container-high pb-space-md">
-            <div class="flex items-center gap-space-md">
-              <div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
-                <span class="material-symbols-outlined text-[28px]">fact_check</span>
-              </div>
-              <div class="flex flex-col">
-                <div class="flex items-center gap-space-xs">
-                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold uppercase">Medical AI Ingestion</span>
-                  <span class="font-label-sm text-label-sm text-outline">Clinical Document Studio</span>
-                </div>
-                <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-0.5">
-                  Medical PDF Summarizer &amp; Evidence Evaluation
-                </h1>
-              </div>
-            </div>
-            <div class="flex items-center gap-2 text-outline font-label-sm text-label-sm bg-surface-container-low px-space-md py-1.5 rounded-lg">
-              <span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
-              <span>Local Ingestion &bull; Confidential Processing</span>
-            </div>
-          </div>
-
-          <!-- Document Upload & Action Form -->
-          <form id="f" class="flex flex-col gap-space-md">
-            <!-- PDF Upload Dropzone -->
-            <div id="dropzone" class="border-2 border-dashed border-outline-variant hover:border-primary rounded-xl p-space-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex flex-col items-center justify-center gap-space-sm text-center group">
-              <input type="file" name="pdf" id="pdfInput" accept="application/pdf" required class="hidden"/>
-              <div class="w-14 h-14 rounded-full bg-surface-container-lowest group-hover:bg-primary-container group-hover:text-on-primary-container text-primary flex items-center justify-center transition-colors shadow-sm">
-                <span class="material-symbols-outlined text-[30px]" id="uploadIcon">upload_file</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <span class="font-label-md text-label-md text-on-surface font-semibold group-hover:text-primary transition-colors" id="filePromptText">
-                  Select or drag medical PDF report here
-                </span>
-                <span class="text-body-sm font-body-sm text-on-surface-variant text-[12px] mt-0.5" id="fileHelpText">
-                  Upload clinical summaries, EHR documentation, or trials (PDF up to 20MB)
-                </span>
-              </div>
-              <div id="fileSelectedBadge" class="hidden items-center gap-2 px-space-md py-1 rounded-full bg-surface-container-lowest border border-primary/30 text-primary font-label-sm text-label-sm shadow-sm mt-1">
-                <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
-                <span id="selectedFileName" class="font-medium"></span>
-              </div>
-            </div>
-
-            <!-- Controls: Engine Option & Action Buttons -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-surface-container-low p-space-md rounded-lg">
-              <div class="flex items-center gap-space-sm">
-                <label for="mode" class="font-label-md text-label-md text-on-surface-variant font-medium flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
-                  <span>Option:</span>
-                </label>
-                <select name="mode" id="mode" class="h-9 px-space-md rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md focus:outline-none focus:ring-2 focus:ring-primary transition-all">
-                  <option value="FAST" selected>FAST</option>
-                  <option value="DETAILED">DETAILED</option>
-                </select>
-                <span class="text-outline text-[12px] font-body-sm hidden md:inline">
-                  (FAST = Rapid synthesis &bull; DETAILED = High-granularity clinical analysis)
-                </span>
-              </div>
-
-              <div class="flex items-center gap-space-sm flex-wrap">
-                <button type="submit" id="summarizeBtn" name="action" value="summarize" class="h-9 px-space-lg rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md active:scale-95">
-                  <span class="material-symbols-outlined text-[18px]">summarize</span>
-                  <span>Summarize</span>
-                </button>
-                <button type="submit" id="evaluateBtn" name="action" value="evaluate" class="h-9 px-space-lg rounded-lg bg-secondary hover:bg-secondary-container text-on-secondary hover:text-on-secondary-container font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md active:scale-95">
-                  <span class="material-symbols-outlined text-[18px]">fact_check</span>
-                  <span>Evaluate</span>
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <!-- Live Status Feedback Banner -->
-          <div id="statusWrapper" class="hidden flex items-center gap-space-sm p-space-md rounded-lg bg-surface-container text-on-surface transition-all">
-            <div id="statusSpinner" class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <p id="status" class="font-label-md text-label-md text-on-surface flex-1 m-0"></p>
-          </div>
-
-          <p class="text-outline font-body-sm text-[12px] m-0">
-            <small>For informational purposes only; not medical advice.</small>
-          </p>
-        </div>
-
-        <!-- Initial Ready Card (Shown before document ingestion) -->
-        <div id="readyCard" class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col items-center justify-center text-center gap-space-sm border border-dashed border-outline-variant/60 py-16">
-          <div class="w-16 h-16 rounded-full bg-surface-container-low text-primary flex items-center justify-center shadow-sm mb-2">
-            <span class="material-symbols-outlined text-[36px]">clinical_notes</span>
-          </div>
-          <h3 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">
-            Ready for Clinical Document Ingestion
-          </h3>
-          <p class="font-body-md text-body-md text-on-surface-variant max-w-lg">
-            Upload a medical PDF report above and select <strong>Summarize</strong> or <strong>Evaluate</strong>. The clinical findings, diagnoses, medications, and recommendations will be dynamically rendered in the GRADE Standard Assessment format below.
-          </p>
-        </div>
-
-        <!-- Dynamic GRADE Standard Assessment Dossier Card (Rendered upon analysis) -->
-        <div id="assessmentContainer" class="hidden flex flex-col gap-space-xl">
-
-          <!-- Header Clinical Dossier Card -->
-          <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg border border-outline-variant/30">
-            <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-space-lg">
-              <div class="flex flex-col gap-space-xs max-w-4xl">
-                <div class="flex items-center gap-space-sm flex-wrap">
-                  <span id="assessmentBadge" class="px-space-sm py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-evidence-badge text-evidence-badge tracking-wider uppercase font-semibold">GRADE Standard Assessment</span>
-                  <span id="assessmentDate" class="text-outline text-label-sm font-label-sm"></span>
-                  <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-                  <span id="assessmentFileRef" class="text-outline text-label-sm font-label-sm"></span>
-                </div>
-                <h2 id="assessmentTitle" class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1"></h2>
-                <p id="assessmentPatientSummary" class="font-body-md text-body-md text-on-surface-variant leading-relaxed"></p>
-              </div>
-
-              <!-- Quick Summary Micro-Widget -->
-              <div class="flex xl:flex-col items-center xl:items-end justify-between gap-space-md bg-surface-container-low p-space-md rounded-lg flex-shrink-0">
-                <div class="flex flex-col xl:text-right">
-                  <span class="font-evidence-badge text-evidence-badge text-outline uppercase">Synthesis Status</span>
-                  <span id="assessmentModeStatus" class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1 xl:justify-end">
-                    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                    FAST Engine
-                  </span>
-                </div>
-                <div class="flex flex-col xl:text-right">
-                  <span class="font-evidence-badge text-evidence-badge text-outline uppercase">GRADE Certainty</span>
-                  <div class="flex items-center gap-1 text-primary">
-                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
-                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
-                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
-                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
-                    <span class="font-label-sm text-label-sm font-semibold ml-1 text-on-surface">Validated (⊕⊕⊕⊕)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Consensus Grade / Recommendation Banner -->
-            <div id="verdictBanner" class="rounded-lg bg-surface-container p-space-lg flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg">
-              <div class="flex items-start gap-space-md">
-                <div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
-                  <span class="material-symbols-outlined text-[28px]" id="verdictIcon">fact_check</span>
-                </div>
-                <div class="flex flex-col">
-                  <div class="flex items-center gap-space-sm flex-wrap">
-                    <span class="font-evidence-badge text-evidence-badge uppercase tracking-wider text-on-secondary-container bg-surface-container-lowest px-2 py-0.5 rounded shadow-sm" id="verdictBadgeText">Formal Verdict</span>
-                    <span class="font-label-sm text-label-sm text-outline">Clinical Practice Guidance</span>
-                  </div>
-                  <h3 id="assessmentVerdict" class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight mt-0.5"></h3>
-                  <p id="assessmentVerdictDetails" class="font-body-sm text-body-sm text-on-surface-variant max-w-3xl mt-0.5"></p>
-                </div>
-              </div>
-
-              <!-- Action Bar with Copy, Export PDF, and Download Button -->
-              <div id="actions" class="flex items-center gap-space-xs flex-wrap flex-shrink-0">
-                <button id="copyBtn" type="button" class="h-9 px-space-md rounded bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1 transition-colors shadow-sm">
-                  <span class="material-symbols-outlined text-[18px]">content_copy</span>
-                  <span>Copy</span>
-                </button>
-                <button id="export-pdf-report-btn" type="button" class="h-9 px-space-md rounded bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1 transition-colors shadow-sm">
-                  <span class="material-symbols-outlined text-[18px] text-primary">picture_as_pdf</span>
-                  <span>Export PDF</span>
-                </button>
-                <button id="downloadBtn" type="button" class="h-9 px-space-md rounded bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1 transition-all shadow-md">
-                  <span class="material-symbols-outlined text-[18px]">download</span>
-                  <span>Download Summary</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 01 & Clinical Findings Bento Grid -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
-            <!-- Section 01: Executive Summary & Synthesized Findings (7 cols) -->
-            <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-md border border-outline-variant/30">
-              <div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
-                <div class="flex items-center gap-space-sm">
-                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold uppercase">Section 01</span>
-                  <h3 class="font-headline-md text-headline-md text-on-surface">Executive Summary &amp; Synthesized Findings</h3>
-                </div>
-                <span class="material-symbols-outlined text-outline text-[20px]">medical_information</span>
-              </div>
-
-              <div class="flex flex-col gap-space-md text-on-surface font-body-md text-body-md leading-relaxed">
-                <div>
-                  <span class="font-label-md text-label-md text-outline uppercase font-semibold">Document Overview</span>
-                  <p id="assessmentOverview" class="text-on-surface font-body-md text-body-md leading-relaxed mt-1"></p>
-                </div>
-
-                <!-- Key Findings Container -->
-                <div class="flex flex-col gap-space-sm pt-space-xs">
-                  <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[18px] text-primary">insights</span>
-                    <span>Key Findings</span>
-                  </span>
-                  <div id="assessmentKeyFindings" class="flex flex-col gap-space-xs"></div>
-                </div>
-
-                <!-- Next Courses of Action (prominent for evaluate mode) -->
-                <div id="nextActionsContainer" class="hidden p-space-md rounded-lg bg-surface-container-low border border-primary/20 flex flex-col gap-space-xs">
-                  <div class="flex items-center gap-space-xs text-primary font-label-md text-label-md font-semibold">
-                    <span class="material-symbols-outlined text-[20px]">lightbulb</span>
-                    <span>Recommended Next Courses of Action</span>
-                  </div>
-                  <p id="assessmentNextActions" class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed"></p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Column: Diagnoses, Medications, Follow-up Bento (5 cols) -->
-            <div class="lg:col-span-5 flex flex-col gap-space-lg">
-              <!-- Diagnoses / Conditions Card -->
-              <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
-                <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
-                  <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[18px] text-primary">stethoscope</span>
-                    <span>Diagnoses &amp; Conditions</span>
-                  </span>
-                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-on-secondary-container px-2 py-0.5 rounded uppercase font-semibold">Identified</span>
-                </div>
-                <div id="assessmentDiagnoses" class="flex flex-wrap gap-1.5 pt-1"></div>
-              </div>
-
-              <!-- Medications / Therapies Card -->
-              <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
-                <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
-                  <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">medication</span>
-                    <span>Medications &amp; Therapies</span>
-                  </span>
-                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-outline px-2 py-0.5 rounded uppercase font-semibold">Documented</span>
-                </div>
-                <div id="assessmentMedications" class="flex flex-wrap gap-1.5 pt-1"></div>
-              </div>
-
-              <!-- Recommended Follow-up Card -->
-              <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
-                <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
-                  <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[18px] text-tertiary">calendar_clock</span>
-                    <span>Recommended Follow-up</span>
-                  </span>
-                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-outline px-2 py-0.5 rounded uppercase font-semibold">Clinical Plan</span>
-                </div>
-                <p id="assessmentFollowUp" class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed pt-1"></p>
-              </div>
-
-              <!-- AI Safety Notice -->
-              <div class="p-space-md rounded-lg bg-surface-container-low border border-outline-variant/30 flex items-start gap-space-sm">
-                <span class="material-symbols-outlined text-outline text-[20px] mt-0.5">info</span>
-                <div class="flex flex-col text-[12px] font-body-sm text-on-surface-variant">
-                  <span class="font-semibold text-on-surface">Clinical Evidence Advisory</span>
-                  <span>AI-generated synthesis. Informational purposes only; not a substitute for clinical judgment.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Raw Text / JSON Inspector -->
-          <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
-            <div class="flex items-center justify-between">
-              <span class="font-label-md text-label-md text-outline font-semibold uppercase tracking-wider">Raw Output Inspector</span>
-              <button id="toggleRawBtn" type="button" class="text-primary hover:underline font-label-sm text-label-sm flex items-center gap-1">
-                <span class="material-symbols-outlined text-[16px]">terminal</span>
-                <span id="toggleRawText">Show Raw Text</span>
-              </button>
-            </div>
-            <pre id="out" class="hidden whitespace-pre-wrap font-body-sm text-body-sm text-on-surface bg-surface-container-low border border-outline-variant/40 rounded-lg p-space-md max-h-[350px] overflow-y-auto leading-relaxed shadow-inner"></pre>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-  </main>
-
-  <!-- Audit Modal -->
-  <div class="fixed inset-0 z-50 bg-inverse-surface/40 backdrop-blur-[2px] hidden items-center justify-center p-space-md transition-opacity" id="audit-log-modal">
-    <div class="bg-surface-container-lowest rounded-xl shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
-      <div class="p-space-lg bg-surface-container flex items-center justify-between">
-        <div class="flex items-center gap-space-sm">
-          <span class="material-symbols-outlined text-primary text-[22px]">history</span>
-          <div class="flex flex-col">
-            <h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Audit History &amp; Immutable Log</h4>
-            <span class="font-evidence-badge text-evidence-badge text-outline">Clinical Document Studio</span>
-          </div>
-        </div>
-        <button class="p-1 rounded hover:bg-surface-container-highest text-on-surface-variant transition-colors" id="close-audit-modal" type="button">
-          <span class="material-symbols-outlined text-[20px]">close</span>
-        </button>
-      </div>
-      <div class="p-space-lg overflow-y-auto space-y-space-md font-body-sm text-body-sm">
-        <div class="flex items-start gap-space-md">
-          <span class="w-2.5 h-2.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
-          <div class="flex flex-col">
-            <div class="flex items-center gap-2">
-              <span class="font-label-sm text-label-sm text-on-surface font-semibold">Clinical Document Studio Ingestion Pipeline Active</span>
-              <span class="font-evidence-badge text-evidence-badge text-outline">Today, Live Session</span>
-            </div>
-            <p class="text-on-surface-variant mt-0.5">Ollama local inference service connected with dual FAST and DETAILED engine options.</p>
-          </div>
-        </div>
-      </div>
-      <div class="p-space-md bg-surface-container-low flex justify-end">
-        <button class="px-space-md py-1.5 bg-surface-container-lowest hover:bg-surface-container rounded text-on-surface font-label-md text-label-md transition-colors shadow-sm" id="close-audit-modal-btn" type="button">
-          Close Audit Viewer
-        </button>
+      <!-- Trust Badges -->
+      <div class="flex items-center justify-center gap-space-md text-[12px] text-outline pt-space-xs">
+        <span class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+          <span>HIPAA Verified</span>
+        </span>
+        <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+        <span class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px] text-secondary">lock</span>
+          <span>OIDC OAuth 2.0</span>
+        </span>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div class="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-space-lg py-space-md rounded-lg shadow-xl flex items-center gap-space-sm transform translate-y-24 opacity-0 transition-all duration-300" id="consensus-toast">
-    <span class="material-symbols-outlined text-primary-fixed-dim text-[20px]" id="toast-icon">check_circle</span>
-    <span class="font-label-md text-label-md" id="toast-msg">Digital Signature Affixed</span>
+  <!-- Main Authenticated App View (Shown once logged in) -->
+  <div id="appView" class="hidden">
+    <!-- Top Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+      <div class="h-20 w-full px-margin-lg flex items-center justify-between gap-space-lg">
+        <div class="flex items-center gap-space-xl flex-shrink-0">
+          <div class="flex items-center gap-space-md">
+            <div class="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-[22px]">medical_services</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-headline-sm text-headline-sm text-on-surface leading-tight tracking-tight">AevitasMed</span>
+              <span class="font-evidence-badge text-evidence-badge text-outline tracking-wider uppercase">Evidence &amp; Synthesis Engine</span>
+            </div>
+          </div>
+          <div class="h-8 w-px bg-surface-container-high hidden xl:block"></div>
+          <nav class="flex items-center gap-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm">
+            <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md bg-primary-container text-on-primary-container font-semibold transition-colors" href="#">Clinical Summarizer</a>
+            <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">Evidence Dashboard</a>
+            <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">Claim Workspace</a>
+            <a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">Consensus Reports</a>
+          </nav>
+        </div>
+
+        <div class="flex-1 max-w-md mx-space-md hidden lg:block">
+          <div class="relative flex items-center w-full">
+            <span class="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none">search</span>
+            <input class="w-full h-9 pl-9 pr-space-md rounded-lg bg-surface-container-low font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-all" placeholder="Query PubMed ID, DOI, ClinicalTrials.gov NCT..." type="text"/>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-space-md flex-shrink-0">
+          <div class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container text-on-secondary-container">
+            <span class="material-symbols-outlined text-[14px] text-primary">verified_user</span>
+            <span class="font-evidence-badge text-evidence-badge uppercase tracking-wider">HIPAA Verified</span>
+          </div>
+          <button aria-label="Notifications" class="p-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors relative" type="button">
+            <span class="material-symbols-outlined text-[20px]">notifications</span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary"></span>
+          </button>
+          <div class="h-8 w-px bg-surface-container-high"></div>
+
+          <!-- Upper Right Authenticated User Name & Profile -->
+          <div class="flex items-center gap-space-sm pl-space-xs" id="userProfileArea">
+            <div class="w-8 h-8 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-semibold text-xs border border-primary/20 overflow-hidden" id="userAvatarContainer">
+              <span id="userInitials">CL</span>
+            </div>
+            <div class="flex flex-col text-left hidden sm:flex">
+              <span class="font-label-sm text-label-sm text-on-surface font-semibold leading-tight" id="userNameDisplay">Clinician</span>
+              <span class="font-evidence-badge text-evidence-badge text-outline leading-tight" id="userRoleDisplay">Authenticated</span>
+            </div>
+            <a href="/auth/logout" class="ml-space-xs p-1 rounded text-outline hover:text-error hover:bg-surface-container transition-colors" title="Sign out">
+              <span class="material-symbols-outlined text-[18px]">logout</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="w-full pt-20 bg-background min-h-screen">
+      <div class="flex flex-col w-full">
+        <div class="w-full px-margin-lg py-space-xl max-w-[1520px] mx-auto flex flex-col gap-space-xl">
+
+          <!-- Breadcrumb & Action Bar -->
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-space-md">
+            <div class="flex items-center gap-space-sm font-label-sm text-label-sm text-on-surface-variant flex-wrap">
+              <a class="hover:text-primary transition-colors" href="#">Consensus Archive</a>
+              <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+              <span class="text-on-surface-variant">Clinical Evidence Engine</span>
+              <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+              <span class="text-primary font-semibold" id="topDossierRef">#EVAL-CLINICAL-ACTIVE</span>
+              <span class="ml-space-sm px-space-sm py-0.5 rounded bg-surface-container font-evidence-badge text-evidence-badge text-primary uppercase" id="topStatusPill">Live Engine</span>
+            </div>
+            <div class="flex items-center gap-space-sm flex-wrap">
+              <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="audit-log-btn" type="button">
+                <span class="material-symbols-outlined text-[18px] text-tertiary">history</span>
+                <span>Audit History Log</span>
+              </button>
+              <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="share-committee-btn" type="button">
+                <span class="material-symbols-outlined text-[18px] text-outline">group_add</span>
+                <span>Share Committee</span>
+              </button>
+              <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="export-pdf-btn" type="button">
+                <span class="material-symbols-outlined text-[18px] text-primary">picture_as_pdf</span>
+                <span>Export PDF</span>
+              </button>
+              <button class="h-9 px-space-lg rounded bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md" id="signoff-modal-btn" type="button">
+                <span class="material-symbols-outlined text-[18px]">verified</span>
+                <span>Sign Off Digital Signature</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Interactive Clinical Document Ingestion Studio (Core Application) -->
+          <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg border border-outline-variant/30">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md border-b border-surface-container-high pb-space-md">
+              <div class="flex items-center gap-space-md">
+                <div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <span class="material-symbols-outlined text-[28px]">fact_check</span>
+                </div>
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-space-xs">
+                    <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold uppercase">Medical AI Ingestion</span>
+                    <span class="font-label-sm text-label-sm text-outline">Clinical Document Studio</span>
+                  </div>
+                  <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-0.5">
+                    Medical PDF Summarizer &amp; Evidence Evaluation
+                  </h1>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 text-outline font-label-sm text-label-sm bg-surface-container-low px-space-md py-1.5 rounded-lg">
+                <span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+                <span>Local Ingestion &bull; Confidential Processing</span>
+              </div>
+            </div>
+
+            <!-- Document Upload & Action Form -->
+            <form id="f" class="flex flex-col gap-space-md">
+              <!-- PDF Upload Dropzone -->
+              <div id="dropzone" class="border-2 border-dashed border-outline-variant hover:border-primary rounded-xl p-space-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex flex-col items-center justify-center gap-space-sm text-center group">
+                <input type="file" name="pdf" id="pdfInput" accept="application/pdf" required class="hidden"/>
+                <div class="w-14 h-14 rounded-full bg-surface-container-lowest group-hover:bg-primary-container group-hover:text-on-primary-container text-primary flex items-center justify-center transition-colors shadow-sm">
+                  <span class="material-symbols-outlined text-[30px]" id="uploadIcon">upload_file</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <span class="font-label-md text-label-md text-on-surface font-semibold group-hover:text-primary transition-colors" id="filePromptText">
+                    Select or drag medical PDF report here
+                  </span>
+                  <span class="text-body-sm font-body-sm text-on-surface-variant text-[12px] mt-0.5" id="fileHelpText">
+                    Upload clinical summaries, EHR documentation, or trials (PDF up to 20MB)
+                  </span>
+                </div>
+                <div id="fileSelectedBadge" class="hidden items-center gap-2 px-space-md py-1 rounded-full bg-surface-container-lowest border border-primary/30 text-primary font-label-sm text-label-sm shadow-sm mt-1">
+                  <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+                  <span id="selectedFileName" class="font-medium"></span>
+                </div>
+              </div>
+
+              <!-- Controls: Engine Option & Action Buttons -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-surface-container-low p-space-md rounded-lg">
+                <div class="flex items-center gap-space-sm">
+                  <label for="mode" class="font-label-md text-label-md text-on-surface-variant font-medium flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
+                    <span>Option:</span>
+                  </label>
+                  <select name="mode" id="mode" class="h-9 px-space-md rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+                    <option value="FAST" selected>FAST</option>
+                    <option value="DETAILED">DETAILED</option>
+                  </select>
+                  <span class="text-outline text-[12px] font-body-sm hidden md:inline">
+                    (FAST = Rapid synthesis &bull; DETAILED = High-granularity clinical analysis)
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-space-sm flex-wrap">
+                  <button type="submit" id="summarizeBtn" name="action" value="summarize" class="h-9 px-space-lg rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md active:scale-95">
+                    <span class="material-symbols-outlined text-[18px]">summarize</span>
+                    <span>Summarize</span>
+                  </button>
+                  <button type="submit" id="evaluateBtn" name="action" value="evaluate" class="h-9 px-space-lg rounded-lg bg-secondary hover:bg-secondary-container text-on-secondary hover:text-on-secondary-container font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md active:scale-95">
+                    <span class="material-symbols-outlined text-[18px]">fact_check</span>
+                    <span>Evaluate</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Live Status Feedback Banner -->
+            <div id="statusWrapper" class="hidden flex items-center gap-space-sm p-space-md rounded-lg bg-surface-container text-on-surface transition-all">
+              <div id="statusSpinner" class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <p id="status" class="font-label-md text-label-md text-on-surface flex-1 m-0"></p>
+            </div>
+
+            <p class="text-outline font-body-sm text-[12px] m-0">
+              <small>For informational purposes only; not medical advice.</small>
+            </p>
+          </div>
+
+          <!-- Initial Ready Card (Shown before document ingestion) -->
+          <div id="readyCard" class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col items-center justify-center text-center gap-space-sm border border-dashed border-outline-variant/60 py-16">
+            <div class="w-16 h-16 rounded-full bg-surface-container-low text-primary flex items-center justify-center shadow-sm mb-2">
+              <span class="material-symbols-outlined text-[36px]">clinical_notes</span>
+            </div>
+            <h3 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">
+              Ready for Clinical Document Ingestion
+            </h3>
+            <p class="font-body-md text-body-md text-on-surface-variant max-w-lg">
+              Upload a medical PDF report above and select <strong>Summarize</strong> or <strong>Evaluate</strong>. The clinical findings, diagnoses, medications, and recommendations will be dynamically rendered in the GRADE Standard Assessment format below.
+            </p>
+          </div>
+
+          <!-- Dynamic GRADE Standard Assessment Dossier Card (Rendered upon analysis) -->
+          <div id="assessmentContainer" class="hidden flex flex-col gap-space-xl">
+
+            <!-- Header Clinical Dossier Card -->
+            <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg border border-outline-variant/30">
+              <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-space-lg">
+                <div class="flex flex-col gap-space-xs max-w-4xl">
+                  <div class="flex items-center gap-space-sm flex-wrap">
+                    <span id="assessmentBadge" class="px-space-sm py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-evidence-badge text-evidence-badge tracking-wider uppercase font-semibold">GRADE Standard Assessment</span>
+                    <span id="assessmentDate" class="text-outline text-label-sm font-label-sm"></span>
+                    <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+                    <span id="assessmentFileRef" class="text-outline text-label-sm font-label-sm"></span>
+                  </div>
+                  <h2 id="assessmentTitle" class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1"></h2>
+                  <p id="assessmentPatientSummary" class="font-body-md text-body-md text-on-surface-variant leading-relaxed"></p>
+                </div>
+
+                <!-- Quick Summary Micro-Widget -->
+                <div class="flex xl:flex-col items-center xl:items-end justify-between gap-space-md bg-surface-container-low p-space-md rounded-lg flex-shrink-0">
+                  <div class="flex flex-col xl:text-right">
+                    <span class="font-evidence-badge text-evidence-badge text-outline uppercase">Synthesis Status</span>
+                    <span id="assessmentModeStatus" class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1 xl:justify-end">
+                      <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                      FAST Engine
+                    </span>
+                  </div>
+                  <div class="flex flex-col xl:text-right">
+                    <span class="font-evidence-badge text-evidence-badge text-outline uppercase">GRADE Certainty</span>
+                    <div class="flex items-center gap-1 text-primary">
+                      <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                      <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                      <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                      <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                      <span class="font-label-sm text-label-sm font-semibold ml-1 text-on-surface">Validated (⊕⊕⊕⊕)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Consensus Grade / Recommendation Banner -->
+              <div id="verdictBanner" class="rounded-lg bg-surface-container p-space-lg flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg">
+                <div class="flex items-start gap-space-md">
+                  <div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <span class="material-symbols-outlined text-[28px]" id="verdictIcon">fact_check</span>
+                  </div>
+                  <div class="flex flex-col">
+                    <div class="flex items-center gap-space-sm flex-wrap">
+                      <span class="font-evidence-badge text-evidence-badge uppercase tracking-wider text-on-secondary-container bg-surface-container-lowest px-2 py-0.5 rounded shadow-sm" id="verdictBadgeText">Formal Verdict</span>
+                      <span class="font-label-sm text-label-sm text-outline">Clinical Practice Guidance</span>
+                    </div>
+                    <h3 id="assessmentVerdict" class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight mt-0.5"></h3>
+                    <p id="assessmentVerdictDetails" class="font-body-sm text-body-sm text-on-surface-variant max-w-3xl mt-0.5"></p>
+                  </div>
+                </div>
+
+                <!-- Action Bar with Copy, Export PDF, and Download Button -->
+                <div id="actions" class="flex items-center gap-space-xs flex-wrap flex-shrink-0">
+                  <button id="copyBtn" type="button" class="h-9 px-space-md rounded bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1 transition-colors shadow-sm">
+                    <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                    <span>Copy</span>
+                  </button>
+                  <button id="export-pdf-report-btn" type="button" class="h-9 px-space-md rounded bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1 transition-colors shadow-sm">
+                    <span class="material-symbols-outlined text-[18px] text-primary">picture_as_pdf</span>
+                    <span>Export PDF</span>
+                  </button>
+                  <button id="downloadBtn" type="button" class="h-9 px-space-md rounded bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1 transition-all shadow-md">
+                    <span class="material-symbols-outlined text-[18px]">download</span>
+                    <span>Download Summary</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 01 & Clinical Findings Bento Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+              <!-- Section 01: Executive Summary & Synthesized Findings (7 cols) -->
+              <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-md border border-outline-variant/30">
+                <div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+                  <div class="flex items-center gap-space-sm">
+                    <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold uppercase">Section 01</span>
+                    <h3 class="font-headline-md text-headline-md text-on-surface">Executive Summary &amp; Synthesized Findings</h3>
+                  </div>
+                  <span class="material-symbols-outlined text-outline text-[20px]">medical_information</span>
+                </div>
+
+                <div class="flex flex-col gap-space-md text-on-surface font-body-md text-body-md leading-relaxed">
+                  <div>
+                    <span class="font-label-md text-label-md text-outline uppercase font-semibold">Document Overview</span>
+                    <p id="assessmentOverview" class="text-on-surface font-body-md text-body-md leading-relaxed mt-1"></p>
+                  </div>
+
+                  <!-- Key Findings Container -->
+                  <div class="flex flex-col gap-space-sm pt-space-xs">
+                    <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[18px] text-primary">insights</span>
+                      <span>Key Findings</span>
+                    </span>
+                    <div id="assessmentKeyFindings" class="flex flex-col gap-space-xs"></div>
+                  </div>
+
+                  <!-- Next Courses of Action (prominent for evaluate mode) -->
+                  <div id="nextActionsContainer" class="hidden p-space-md rounded-lg bg-surface-container-low border border-primary/20 flex flex-col gap-space-xs">
+                    <div class="flex items-center gap-space-xs text-primary font-label-md text-label-md font-semibold">
+                      <span class="material-symbols-outlined text-[20px]">lightbulb</span>
+                      <span>Recommended Next Courses of Action</span>
+                    </div>
+                    <p id="assessmentNextActions" class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: Diagnoses, Medications, Follow-up Bento (5 cols) -->
+              <div class="lg:col-span-5 flex flex-col gap-space-lg">
+                <!-- Diagnoses / Conditions Card -->
+                <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
+                  <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
+                    <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[18px] text-primary">stethoscope</span>
+                      <span>Diagnoses &amp; Conditions</span>
+                    </span>
+                    <span class="font-evidence-badge text-evidence-badge bg-surface-container text-on-secondary-container px-2 py-0.5 rounded uppercase font-semibold">Identified</span>
+                  </div>
+                  <div id="assessmentDiagnoses" class="flex flex-wrap gap-1.5 pt-1"></div>
+                </div>
+
+                <!-- Medications / Therapies Card -->
+                <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
+                  <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
+                    <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[18px] text-secondary">medication</span>
+                      <span>Medications &amp; Therapies</span>
+                    </span>
+                    <span class="font-evidence-badge text-evidence-badge bg-surface-container text-outline px-2 py-0.5 rounded uppercase font-semibold">Documented</span>
+                  </div>
+                  <div id="assessmentMedications" class="flex flex-wrap gap-1.5 pt-1"></div>
+                </div>
+
+                <!-- Recommended Follow-up Card -->
+                <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
+                  <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
+                    <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[18px] text-tertiary">calendar_clock</span>
+                      <span>Recommended Follow-up</span>
+                    </span>
+                    <span class="font-evidence-badge text-evidence-badge bg-surface-container text-outline px-2 py-0.5 rounded uppercase font-semibold">Clinical Plan</span>
+                  </div>
+                  <p id="assessmentFollowUp" class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed pt-1"></p>
+                </div>
+
+                <!-- AI Safety Notice -->
+                <div class="p-space-md rounded-lg bg-surface-container-low border border-outline-variant/30 flex items-start gap-space-sm">
+                  <span class="material-symbols-outlined text-outline text-[20px] mt-0.5">info</span>
+                  <div class="flex flex-col text-[12px] font-body-sm text-on-surface-variant">
+                    <span class="font-semibold text-on-surface">Clinical Evidence Advisory</span>
+                    <span>AI-generated synthesis. Informational purposes only; not a substitute for clinical judgment.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Raw Text / JSON Inspector -->
+            <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
+              <div class="flex items-center justify-between">
+                <span class="font-label-md text-label-md text-outline font-semibold uppercase tracking-wider">Raw Output Inspector</span>
+                <button id="toggleRawBtn" type="button" class="text-primary hover:underline font-label-sm text-label-sm flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">terminal</span>
+                  <span id="toggleRawText">Show Raw Text</span>
+                </button>
+              </div>
+              <pre id="out" class="hidden whitespace-pre-wrap font-body-sm text-body-sm text-on-surface bg-surface-container-low border border-outline-variant/40 rounded-lg p-space-md max-h-[350px] overflow-y-auto leading-relaxed shadow-inner"></pre>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- Audit Modal -->
+    <div class="fixed inset-0 z-50 bg-inverse-surface/40 backdrop-blur-[2px] hidden items-center justify-center p-space-md transition-opacity" id="audit-log-modal">
+      <div class="bg-surface-container-lowest rounded-xl shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+        <div class="p-space-lg bg-surface-container flex items-center justify-between">
+          <div class="flex items-center gap-space-sm">
+            <span class="material-symbols-outlined text-primary text-[22px]">history</span>
+            <div class="flex flex-col">
+              <h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Audit History &amp; Immutable Log</h4>
+              <span class="font-evidence-badge text-evidence-badge text-outline">Clinical Document Studio</span>
+            </div>
+          </div>
+          <button class="p-1 rounded hover:bg-surface-container-highest text-on-surface-variant transition-colors" id="close-audit-modal" type="button">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+        <div class="p-space-lg overflow-y-auto space-y-space-md font-body-sm text-body-sm">
+          <div class="flex items-start gap-space-md">
+            <span class="w-2.5 h-2.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
+            <div class="flex flex-col">
+              <div class="flex items-center gap-2">
+                <span class="font-label-sm text-label-sm text-on-surface font-semibold">Clinical Document Studio Ingestion Pipeline Active</span>
+                <span class="font-evidence-badge text-evidence-badge text-outline">Today, Live Session</span>
+              </div>
+              <p class="text-on-surface-variant mt-0.5">Ollama local inference service connected with dual FAST and DETAILED engine options.</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-space-md bg-surface-container-low flex justify-end">
+          <button class="px-space-md py-1.5 bg-surface-container-lowest hover:bg-surface-container rounded text-on-surface font-label-md text-label-md transition-colors shadow-sm" id="close-audit-modal-btn" type="button">
+            Close Audit Viewer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-space-lg py-space-md rounded-lg shadow-xl flex items-center gap-space-sm transform translate-y-24 opacity-0 transition-all duration-300" id="consensus-toast">
+      <span class="material-symbols-outlined text-primary-fixed-dim text-[20px]" id="toast-icon">check_circle</span>
+      <span class="font-label-md text-label-md" id="toast-msg">Digital Signature Affixed</span>
+    </div>
   </div>
 
   <!-- Application Logic -->
@@ -642,9 +716,89 @@
             assessmentNextActions = document.getElementById('assessmentNextActions'),
             topDossierRef = document.getElementById('topDossierRef');
 
+      // Auth Elements
+      const loginView = document.getElementById('loginView'),
+            appView = document.getElementById('appView'),
+            userNameDisplay = document.getElementById('userNameDisplay'),
+            userRoleDisplay = document.getElementById('userRoleDisplay'),
+            userAvatarContainer = document.getElementById('userAvatarContainer'),
+            loginErrorAlert = document.getElementById('loginErrorAlert'),
+            loginErrorText = document.getElementById('loginErrorText'),
+            demoLoginContainer = document.getElementById('demoLoginContainer'),
+            devLoginBtn = document.getElementById('devLoginBtn');
+
       let currentDownloadText = '';
       let downloadFileName = 'summary.txt';
       let chosenAction = 'summarize';
+
+      // Initialize Authentication State
+      async function initAuth() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const authError = urlParams.get('auth_error');
+
+        if (authError && loginErrorAlert && loginErrorText) {
+          loginErrorAlert.classList.remove('hidden');
+          loginErrorAlert.classList.add('flex');
+          if (authError === 'idp_not_configured') {
+            loginErrorText.textContent = 'Google IdP is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in your environment (see SETUP.md) or use Demo Sign-in below.';
+          } else {
+            loginErrorText.textContent = 'Authentication error: ' + decodeURIComponent(authError);
+          }
+        }
+
+        try {
+          const res = await fetch('/api/auth/me');
+          const data = await res.json();
+
+          if (!data.idpConfigured && demoLoginContainer) {
+            demoLoginContainer.classList.remove('hidden');
+          }
+
+          if (data.authenticated && data.user) {
+            renderAuthenticatedUser(data.user);
+            loginView.classList.add('hidden');
+            appView.classList.remove('hidden');
+          } else {
+            loginView.classList.remove('hidden');
+            appView.classList.add('hidden');
+          }
+        } catch {
+          loginView.classList.remove('hidden');
+          appView.classList.add('hidden');
+        }
+      }
+
+      function renderAuthenticatedUser(user) {
+        if (userNameDisplay) userNameDisplay.textContent = user.name || 'Clinician';
+        if (userRoleDisplay) userRoleDisplay.textContent = user.email || 'Verified Clinician';
+
+        if (userAvatarContainer) {
+          if (user.picture) {
+            userAvatarContainer.innerHTML = `<img src="${user.picture}" alt="${user.name}" class="w-full h-full object-cover"/>`;
+          } else {
+            const initials = (user.name || 'C')
+              .split(' ')
+              .map(n => n[0])
+              .join('')
+              .toUpperCase()
+              .slice(0, 2);
+            userAvatarContainer.innerHTML = `<span id="userInitials">${initials}</span>`;
+          }
+        }
+      }
+
+      devLoginBtn?.addEventListener('click', async () => {
+        try {
+          const res = await fetch('/auth/dev-login', { method: 'POST' });
+          if (res.ok) {
+            window.location.href = '/';
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
+
+      initAuth();
 
       // Toast notification helper
       function showToast(text, icon = 'check_circle') {
@@ -1026,7 +1180,7 @@
       if (closeBtn2) closeBtn2.addEventListener('click', closeModal);
 
       document.getElementById('signoff-modal-btn')?.addEventListener('click', () => {
-        showToast('Digital Signature Key Verified (Dr. Sarah Jenkins, MD) - Logged to Audit Trail', 'verified');
+        showToast('Digital Signature Key Verified - Logged to Audit Trail', 'verified');
       });
 
       document.getElementById('share-committee-btn')?.addEventListener('click', () => {

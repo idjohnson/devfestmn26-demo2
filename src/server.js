@@ -3,6 +3,7 @@ const multer = require('multer');
 const { extractPdfText } = require('./pdf');
 const path = require('path');
 const { summarize, evaluate } = require('./ollama');
+const { attachAuthRoutes } = require('./auth');
 
 const app = express();
 const upload = multer({
@@ -10,7 +11,11 @@ const upload = multer({
   limits: { fileSize: 20 * 1024 * 1024, files: 1 },
 });
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
+
+attachAuthRoutes(app);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
