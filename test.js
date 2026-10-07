@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { buildPrompt, getModel } = require('./src/ollama');
+const { buildPrompt, getModel, parseMarkdownOrText } = require('./src/ollama');
 const app = require('./src/server');
 
 test('prompt includes document text', () => {
@@ -16,6 +16,53 @@ test('prompt uses evaluate instructions when requested', () => {
   );
   assert.doesNotMatch(prompt, /Do not give medical advice/);
   assert.match(prompt, /doc text/);
+});
+
+test('parseMarkdownOrText parses JSON format correctly', () => {
+  const jsonStr = JSON.stringify({
+    title: 'Test Cardiology Memo',
+    verdict: 'Normal sinus rhythm',
+    patient_summary: 'Patient is stable.',
+    overview: 'Routine electrocardiogram.',
+    key_findings: ['Normal PR interval', 'No ST changes'],
+    diagnoses_conditions: ['Sinus Bradycardia'],
+    medications: ['Metoprolol 25mg'],
+    recommended_follow_up: 'Annual exam',
+    next_courses_of_action: 'Continue current therapy'
+  });
+
+  const parsed = parseMarkdownOrText(jsonStr);
+  assert.strictEqual(parsed.title, 'Test Cardiology Memo');
+  assert.strictEqual(parsed.verdict, 'Normal sinus rhythm');
+  assert.deepStrictEqual(parsed.key_findings, ['Normal PR interval', 'No ST changes']);
+
+  const fenced = '```json\n' + jsonStr + '\n```';
+  const parsedFenced = parseMarkdownOrText(fenced);
+  assert.strictEqual(parsedFenced.title, 'Test Cardiology Memo');
+});
+
+test('parseMarkdownOrText parses markdown blocks fallback', () => {
+  const md = `**Patient Summary:** 54-year-old male with persistent cough.
+**Overview:** Outpatient evaluation of respiratory symptoms.
+**Key Findings:**
+- Bilateral wheezing on auscultation
+- Normal chest radiograph
+**Diagnoses/Conditions:**
+- Mild Intermittent Asthma
+**Medications:**
+- Albuterol HFA as needed
+**Recommended Follow-up:** Follow-up in 4 weeks.
+**Next courses of action:** Peak flow monitoring. Note the user that this was AI generated`;
+
+  const parsed = parseMarkdownOrText(md);
+  assert.match(parsed.patient_summary, /54-year-old male/);
+  assert.match(parsed.overview, /Outpatient evaluation/);
+  assert.strictEqual(parsed.key_findings.length, 2);
+  assert.strictEqual(parsed.key_findings[0], 'Bilateral wheezing on auscultation');
+  assert.strictEqual(parsed.diagnoses_conditions[0], 'Mild Intermittent Asthma');
+  assert.strictEqual(parsed.medications[0], 'Albuterol HFA as needed');
+  assert.match(parsed.recommended_follow_up, /4 weeks/);
+  assert.match(parsed.next_courses_of_action, /Peak flow monitoring/);
 });
 
 test('getModel selects appropriate model and defaults to FAST', () => {

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "inverse-surface": "#263143",
+        "outline-variant": "#bfc7d2",
+        "on-secondary-container": "#004f7b",
+        "surface-container-low": "#f0f3ff",
+        "on-tertiary-fixed": "#001e2f",
+        "on-primary-container": "#fdfcff",
+        "surface-container": "#e7eeff",
+        "background": "#f9f9ff",
+        "inverse-on-surface": "#ecf1ff",
+        "surface-container-lowest": "#ffffff",
+        "on-primary-fixed": "#001d31",
+        "on-secondary-fixed-variant": "#004b74",
+        "on-secondary": "#ffffff",
+        "tertiary": "#00628d",
+        "on-surface-variant": "#3f4850",
+        "surface-container-highest": "#d8e3fb",
+        "on-surface": "#111c2d",
+        "primary-fixed-dim": "#93ccff",
+        "on-secondary-fixed": "#001d32",
+        "secondary-container": "#7bc2ff",
+        "on-error-container": "#93000a",
+        "primary": "#006194",
+        "on-primary": "#ffffff",
+        "on-primary-fixed-variant": "#004b73",
+        "on-tertiary-container": "#fcfcff",
+        "secondary-fixed": "#cde5ff",
+        "primary-container": "#007bb9",
+        "secondary": "#006399",
+        "inverse-primary": "#93ccff",
+        "surface": "#f9f9ff",
+        "primary-fixed": "#cce5ff",
+        "on-tertiary": "#ffffff",
+        "surface-tint": "#006398",
+        "surface-variant": "#d8e3fb",
+        "on-tertiary-fixed-variant": "#004c6e",
+        "secondary-fixed-dim": "#94ccff",
+        "on-error": "#ffffff",
+        "outline": "#707881",
+        "on-background": "#111c2d",
+        "tertiary-fixed-dim": "#89ceff",
+        "error": "#ba1a1a",
+        "tertiary-fixed": "#c9e6ff",
+        "surface-container-high": "#dee8ff",
+        "surface-bright": "#f9f9ff",
+        "tertiary-container": "#007cb1",
+        "surface-dim": "#cfdaf2",
+        "error-container": "#ffdad6"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+      "spacing": {
+        "space-xs": "0.25rem",
+        "margin": "1.5rem",
+        "space-xl": "1.5rem",
+        "gutter-lg": "1.5rem",
+        "gutter": "1rem",
+        "space-sm": "0.5rem",
+        "margin-lg": "2rem",
+        "space-2xl": "2rem",
+        "space-md": "0.75rem",
+        "space-lg": "1rem"
+      },
+      "fontFamily": {
+        "label-md": ["Inter"],
+        "headline-lg": ["Inter"],
+        "evidence-badge": ["Inter"],
+        "body-sm": ["Inter"],
+        "body-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "label-sm": ["Inter"],
+        "metric-tabular": ["Inter"],
+        "display-lg": ["Inter"],
+        "headline-md": ["Inter"],
+        "headline-sm": ["Inter"]
+      },
+      "fontSize": {
+        "label-md": ["13px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+        "evidence-badge": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+        "body-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.005em", "fontWeight": "400"}],
+        "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+        "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.015em", "fontWeight": "500"}],
+        "metric-tabular": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "500"}],
+        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+        "headline-sm": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600"}]
+      }
+    }
+  }
+}</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 w-full px-margin-lg flex items-center justify-between gap-space-lg"><div class="flex items-center gap-space-xl flex-shrink-0"><div class="flex items-center gap-space-md"><img alt="AevitasMed Evidence Evaluation Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UxBMYvzHLgBhQ9XBdooTxDeLdYK1KO_dsCJf40E2cL8ZJmld4mbMlauPima_EJenO0C6lWKHWgpqfbho7r21sSIYlJr2gzJq8dlrietn_jyDxR6cCuK38OC4qibgmB6XlN7xUJFDGFLazijWj5An26WVkxSFeD_s9tm6IbT9FJsFL9-fwi8pSZthyj4mxJdLN0zXg60FHcowNM3n257Z48iKmXgy64HRGwMzzbS3Si"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-surface leading-tight tracking-tight">AevitasMed</span><span class="font-evidence-badge text-evidence-badge text-outline tracking-wider uppercase">Evidence Evaluation</span></div></div><div class="h-8 w-px bg-surface-container-high hidden xl:block"></div><nav class="flex items-center gap-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm"><a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="evidence-dashboard" href="#">Evidence Dashboard</a><a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="claim-workspace" href="#">Claim Workspace</a><a class="px-space-md py-space-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="literature-query" href="#">Literature Query</a><a aria-current="page" class="px-space-md py-space-sm rounded-lg transition-colors bg-primary-container text-on-primary-container font-headline-sm" data-path="consensus-reports" href="#">Consensus Reports</a></nav></div><div class="flex-1 max-w-md mx-space-md hidden lg:block"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none">search</span><input class="w-full h-9 pl-9 pr-space-md rounded-lg bg-surface-container-low font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-all" placeholder="Query PubMed ID, DOI, ClinicalTrials.gov NCT..." type="text"/></div></div><div class="flex items-center gap-space-md flex-shrink-0"><div class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container text-on-secondary-container"><span class="material-symbols-outlined text-[14px] text-primary">verified_user</span><span class="font-evidence-badge text-evidence-badge uppercase tracking-wider">HIPAA Verified</span></div><button aria-label="Notifications" class="p-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors relative" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary"></span></button><div class="h-8 w-px bg-surface-container-high"></div><div class="flex items-center gap-space-sm pl-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9e6ipp2r3LnXGZcQp7tGC3rltwz85epJTc67lOT1wxhvSpFauvyNwbQ-AOrsOGrZrh0zx3c5Nyp548VYb2aYlkyCbMZ-HmBkjkHEU0FuCu6L04Le6ppETJ3_0o1ch0nUVUABZYlAegfaHgOviY7WgkxS2dtSeSA-DcCHd_-33-GAz62a4ah01BDzTQHfiYjd0UGSSktPOUfke0ygs_ztGaZgb5TMm3lWAx4ax3Sw"/><div class="flex flex-col text-left hidden sm:flex"><span class="font-label-sm text-label-sm text-on-surface font-semibold leading-tight">Dr. Sarah Jenkins, MD</span><span class="font-evidence-badge text-evidence-badge text-outline leading-tight">Reviewer Lead</span></div></div></div></div></header><main class="w-full pt-20 bg-background min-h-screen"><div class="flex flex-col w-full">
+<div class="w-full px-margin-lg py-space-xl max-w-[1520px] mx-auto flex flex-col gap-space-xl">
+<!-- Breadcrumb & Status Tracker -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-space-md">
+<div class="flex items-center gap-space-sm font-label-sm text-label-sm text-on-surface-variant flex-wrap">
+<a class="hover:text-primary transition-colors" href="#">Consensus Archive</a>
+<span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+<span class="text-on-surface-variant">Neurology & Cognitive Therapeutics</span>
+<span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+<span class="text-primary font-semibold">#EVAL-CONSENSUS-2024-0412</span>
+<span class="ml-space-sm px-space-sm py-0.5 rounded bg-surface-container font-evidence-badge text-evidence-badge text-primary uppercase">v2.1 Final Review</span>
+</div>
+<!-- Action Bar -->
+<div class="flex items-center gap-space-sm flex-wrap">
+<button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="audit-log-btn" type="button">
+<span class="material-symbols-outlined text-[18px] text-tertiary">history</span>
+<span>Audit History Log</span>
+</button>
+<button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="share-committee-btn" type="button">
+<span class="material-symbols-outlined text-[18px] text-outline">group_add</span>
+<span>Share Committee</span>
+</button>
+<button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="export-pdf-btn" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">picture_as_pdf</span>
+<span>Export PDF</span>
+</button>
+<button class="h-9 px-space-lg rounded bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-space-xs transition-all shadow-md" id="signoff-modal-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Sign Off Digital Signature</span>
+</button>
+</div>
+</div>
+<!-- Header Clinical Dossier Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg">
+<div class="flex flex-col xl:flex-row xl:items-start justify-between gap-space-lg">
+<div class="flex flex-col gap-space-xs max-w-4xl">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="px-space-sm py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-evidence-badge text-evidence-badge tracking-wider uppercase font-semibold">GRADE Standard Assessment</span>
+<span class="text-outline text-label-sm font-label-sm">Published: October 24, 2024</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-outline text-label-sm font-label-sm">Protocol Ref: NCT03887455 / NCT04437511</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1">
+            Clinical Evidence Consensus Memo: Anti-Amyloid Monoclonal Antibodies in Early-Stage Alzheimer’s Disease
+          </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Targeting Amyloid-Beta oligomers and protofibrils (Lecanemab & Donanemab) in Mild Cognitive Impairment (MCI) and Mild Dementia due to AD. Comprehensive GRADE appraisal synthesized for Formulary and Therapeutics Committee governance.
+          </p>
+</div>
+<!-- Quick Summary Micro-Widget -->
+<div class="flex xl:flex-col items-center xl:items-end justify-between gap-space-md bg-surface-container-low p-space-md rounded-lg flex-shrink-0">
+<div class="flex flex-col xl:text-right">
+<span class="font-evidence-badge text-evidence-badge text-outline uppercase">Consensus Status</span>
+<span class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1 xl:justify-end">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+              3 of 4 Signatures Affixed
+            </span>
+</div>
+<div class="flex flex-col xl:text-right">
+<span class="font-evidence-badge text-evidence-badge text-outline uppercase">GRADE Certainty</span>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">circle</span>
+<span class="font-label-sm text-label-sm font-semibold ml-1 text-on-surface">Moderate (⊕⊕⊕◯)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Consensus Grade Banner -->
+<div class="rounded-lg bg-surface-container p-space-lg flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg">
+<div class="flex items-start gap-space-md">
+<div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[28px]">fact_check</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="font-evidence-badge text-evidence-badge uppercase tracking-wider text-on-secondary-container bg-surface-container-lowest px-2 py-0.5 rounded shadow-sm">Formal Verdict</span>
+<span class="font-label-sm text-label-sm text-outline">Clinical Practice Guideline Level 2A</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight mt-0.5">
+              FINAL RECOMMENDATION: Conditional Clinical Adoption
+            </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-3xl mt-0.5">
+              Recommended for strictly screened ApoE4-genotyped candidates with documented amyloid biomarker positivity. Mandates rigorous baseline and quarterly 3T-MRI monitoring protocols for ARIA surveillance.
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-space-md flex-shrink-0 flex-wrap">
+<div class="flex flex-col bg-surface-container-lowest px-space-md py-space-sm rounded shadow-sm">
+<span class="font-evidence-badge text-evidence-badge text-outline uppercase">Efficacy Deceleration</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-display-lg text-display-lg text-primary font-semibold tracking-tight">-27%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">vs Placebo</span>
+</div>
+<span class="font-evidence-badge text-evidence-badge text-outline">CDR-SB at 18 months</span>
+</div>
+<div class="flex flex-col bg-surface-container-lowest px-space-md py-space-sm rounded shadow-sm">
+<span class="font-evidence-badge text-evidence-badge text-error uppercase">Safety Risk (ARIA-E)</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-display-lg text-display-lg text-error font-semibold tracking-tight">12.6%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">All Patients</span>
+</div>
+<span class="font-evidence-badge text-evidence-badge text-outline">32.6% in ApoE4 Homozygotes</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 1 & Data Visualization Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+<!-- Section 1: Executive Summary & Synthesized Findings (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold">Section 01</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Executive Summary & Synthesized Findings</h3>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]">medical_information</span>
+</div>
+<div class="space-y-space-md text-on-surface font-body-md text-body-md leading-relaxed">
+<p>
+            The systematic appraisal encompassing two pivotal Phase 3 randomized, double-blind, placebo-controlled trials (Clarity AD, n=1,795; TRAILBLAZER-ALZ 2, n=1,736) demonstrates a statistically significant slowing of cognitive and functional decline in patients with confirmed early-stage Alzheimer’s disease receiving monoclonal anti-amyloid therapy compared to placebo over 18 months.
+          </p>
+<div class="bg-surface-container-low rounded-lg p-space-md flex flex-col gap-space-sm">
+<div class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-primary">insights</span>
+              Primary Cognitive Endpoint: CDR-SB Difference
+            </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Across pooled analysis, the mean change in Clinical Dementia Rating–Sum of Boxes (CDR-SB) exhibited a favorable difference of <span class="font-metric-tabular text-on-surface font-semibold">-0.45 points (95% CI: -0.67 to -0.23, p < 0.001)</span>. Secondary endpoints, including ADAS-Cog14 and ADCS-MCI-ADL, yielded congruent deceleration trajectories (-1.44 points and +1.20 points, respectively).
+            </p>
+</div>
+<p>
+            Despite validated bio-efficacy in cortical amyloid clearance, substantial adverse safety signals dictate circumspect clinical adoption. Amyloid-Related Imaging Abnormalities with edema/effusion (ARIA-E) were reported in 12.6% of patients on active agent versus 1.7% in placebo cohorts. Intracerebral microhemorrhages and hemosiderosis (ARIA-H) occurred in 17.3% versus 9.0%.
+          </p>
+<p class="text-on-surface-variant font-body-sm text-body-sm">
+            Stratified genomic sub-analysis proves clinical peril is heavily concentrated in <strong>ApoE ε4 carriers</strong>, with homozygous carriers exhibiting ARIA-E rates exceeding 32.6% (compared to 5.4% in non-carriers). The consensus panel deems mandatory ApoE genotyping essential prior to treatment initiation, combined with immediate therapy cessation upon manifestation of symptomatic macro-hemorrhages or confluent swelling.
+          </p>
+</div>
+<!-- Interactive Clinical Quote Highlight -->
+<div class="mt-space-sm p-space-md rounded-lg bg-surface-container flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">lightbulb</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Consensus Guideline Stance</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              “The clinical benefit is modest and falls near the predefined minimal clinically important difference (MCID = 0.50), but the biological amyloid plaque elimination is robust. Institutional rollout must be bounded by certified infusion facilities and specialized neuroradiological oversight.”
+            </p>
+</div>
+</div>
+</div>
+<!-- Section 1 Visual Complement: Forest Plot / Efficacy vs Risk Chart (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-lg">
+<!-- Synthetic Forest Plot Visual -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-evidence-badge text-evidence-badge text-outline uppercase tracking-wider">GRADE Meta-Analysis Estimate</span>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">CDR-SB Mean Difference (Forest Plot)</h4>
+</div>
+<span class="font-evidence-badge text-evidence-badge bg-surface-container text-on-secondary-container px-2 py-0.5 rounded">p < 0.001</span>
+</div>
+<!-- Inline SVG Forest Plot Graphic -->
+<div class="bg-surface-container-low rounded-lg p-space-md flex flex-col gap-space-sm">
+<div class="flex justify-between font-label-sm text-label-sm text-outline px-2">
+<span>Favors Active (-1.0)</span>
+<span>Null (0.0)</span>
+<span>Favors Placebo (+0.5)</span>
+</div>
+<svg class="w-full h-36" fill="none" viewbox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
+<!-- Axis Gridlines -->
+<line stroke="#707881" stroke-dasharray="3 3" stroke-width="1.5" x1="240" x2="240" y1="5" y2="125"></line>
+<line stroke="#bfc7d2" stroke-width="1" x1="50" x2="360" y1="125" y2="125"></line>
+<!-- Scale Ticks -->
+<line stroke="#707881" x1="100" x2="100" y1="122" y2="128"></line>
+<line stroke="#707881" x1="170" x2="170" y1="122" y2="128"></line>
+<line stroke="#707881" x1="240" x2="240" y1="122" y2="128"></line>
+<line stroke="#707881" x1="310" x2="310" y1="122" y2="128"></line>
+<!-- Trial 1: Clarity AD -->
+<text class="font-body-sm text-[11px]" fill="#3f4850" x="15" y="28">Clarity AD (n=1,795)</text>
+<line stroke="#006194" stroke-width="2" x1="130" x2="205" y1="25" y2="25"></line>
+<rect fill="#006194" height="8" rx="1" width="8" x="162" y="21"></rect>
+<!-- Trial 2: TRAILBLAZER-ALZ 2 -->
+<text class="font-body-sm text-[11px]" fill="#3f4850" x="15" y="65">TRAILBLAZER (n=1,736)</text>
+<line stroke="#006194" stroke-width="2" x1="120" x2="195" y1="62" y2="62"></line>
+<rect fill="#006194" height="8" rx="1" width="8" x="153" y="58"></rect>
+<!-- Pooled Synthesis Diamond -->
+<text class="font-label-sm text-[11px] font-semibold" fill="#111c2d" x="15" y="103">GRADE Pooled Diamond</text>
+<polygon fill="#007bb9" points="152,100 167,95 182,100 167,105"></polygon>
+<line stroke="#007bb9" stroke-width="2" x1="145" x2="189" y1="100" y2="100"></line>
+</svg>
+<div class="flex items-center justify-between text-label-sm font-label-sm pt-space-xs text-on-surface-variant">
+<span>Overall Effect: MD -0.45 [95% CI: -0.67, -0.23]</span>
+<span class="font-metric-tabular text-on-surface font-semibold">I² = 0.0% (Homogeneous)</span>
+</div>
+</div>
+<!-- ARIA Risk Stratification Breakdown Micro-Cards -->
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Adverse Reaction Risk Ratio by ApoE Profile</span>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="p-space-sm bg-surface-container rounded flex flex-col">
+<span class="font-evidence-badge text-evidence-badge text-outline uppercase">Non-Carriers</span>
+<span class="font-metric-tabular text-headline-sm text-on-surface font-bold">5.4%</span>
+<span class="text-body-sm text-on-surface-variant text-[11px]">Mild Edema / Transient</span>
+</div>
+<div class="p-space-sm bg-error-container/40 rounded flex flex-col">
+<span class="font-evidence-badge text-evidence-badge text-error uppercase font-semibold">Homozygotes (ε4/ε4)</span>
+<span class="font-metric-tabular text-headline-sm text-error font-bold">32.6%</span>
+<span class="text-body-sm text-on-error-container text-[11px]">High ARIA-E / Severe Risk</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Clinical Trial Site Representative Imagery Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="relative h-44 w-full bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="High-resolution clinical magnetic resonance imaging MRI scan display in a hospital neurology research laboratory showing axial cerebral parenchyma views with analytical segmentation overlays in slate blue and clinical cerulean blue tones, scientific, objective, sharp clinical illumination" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAvVrCtpU2Hsp9bJtbH5O-5fIVEfQZa6f1n7-TyVUXPCocukX5L8U9idgw3ocyEiFNmxwjz36mzNK3zfeKfS6jhEoOo1zf2vwGFGLSwRRlbc5zpz_Y32n22yl7z4PIWxSCzRzmN01GkWlsoRd_hJ9gHbPsCfFS_LUcVjA-Rw2_GwORfiEYCfjimA4RRcpiXAOMihfjt8XUi1dcZ19AxAeIT-g664JBbAh9CCjiGng"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-inverse-surface/30 to-transparent flex items-end p-space-md">
+<div class="flex flex-col text-inverse-on-surface">
+<span class="font-evidence-badge text-evidence-badge uppercase tracking-wider text-secondary-container">ARIA Imaging Surveillance Standard</span>
+<span class="font-label-sm text-label-sm font-medium">Sequential FLAIR and T2* GRE baseline vs 12-week protocol</span>
+</div>
+</div>
+</div>
+<div class="p-space-md flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant bg-surface-container-low">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary">biotech</span>
+              Imaging Core Review: Massachusetts General & Mayo Lab
+            </span>
+<span class="font-metric-tabular text-on-surface font-medium">DICOM v3 Compliant</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: Summary of Findings Table (GRADE Evidence Profile) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm">
+<span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold">Section 02</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Summary of Findings Table: GRADE Evidence Profile</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Patients: Mild Cognitive Impairment (MCI) or Mild AD • Intervention: Anti-Amyloid mAb Therapy • Comparator: Placebo • Setting: Outpatient Infusion Centers
+          </p>
+</div>
+<div class="flex items-center gap-space-xs flex-wrap">
+<button class="px-space-md py-1 bg-surface-container-low hover:bg-surface-container rounded text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+            All 5 Endpoints
+          </button>
+<button class="px-space-md py-1 bg-surface-container-low hover:bg-surface-container rounded text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+            GRADE Parameters
+          </button>
+</div>
+</div>
+<!-- Systematic Table -->
+<div class="w-full overflow-x-auto rounded-lg shadow-sm">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-space-md px-space-md">Clinical Outcome</th>
+<th class="py-space-md px-space-md">Relative Effect (95% CI)</th>
+<th class="py-space-md px-space-md">Anticipated Absolute Risk Difference</th>
+<th class="py-space-md px-space-md">Certainty of Evidence (GRADE)</th>
+<th class="py-space-md px-space-md">Downgrade Rationale / Explanatory Notes</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high font-body-sm text-body-sm text-on-surface">
+<!-- Row 1: CDR-SB -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-space-md px-space-md font-medium">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Cognitive & Functional Decline (CDR-SB)</span>
+<span class="text-on-surface-variant text-[12px]">Follow-up: 18 months • High priority</span>
+</div>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span class="font-semibold text-primary">MD -0.45</span>
+<span class="text-on-surface-variant text-[12px] block">(-0.67 to -0.23)</span>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span>The mean change was <strong>0.45 points slower</strong> progression on an 18-point scale</span>
+</td>
+<td class="py-space-md px-space-md">
+<div class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-surface-container text-on-secondary-container">
+<span class="text-primary font-bold">⊕⊕⊕◯</span>
+<span class="font-evidence-badge text-evidence-badge uppercase font-semibold">Moderate</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-on-surface-variant text-[12px]">
+                Downgraded 1 level for indirectness: Clinical meaningfulness of 0.45 point difference remains debated relative to patient-perceived quality of life.
+              </td>
+</tr>
+<!-- Row 2: Amyloid Burden Clearance -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-space-md px-space-md font-medium">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Cerebral Amyloid Plaque Burden (PET Centiloids)</span>
+<span class="text-on-surface-variant text-[12px]">Biomarker proxy • 18 months</span>
+</div>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span class="font-semibold text-primary">MD -59.12 CL</span>
+<span class="text-on-surface-variant text-[12px] block">(-63.50 to -54.74)</span>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span>68% of treated patients achieved amyloid-negative status (<30 CL)</span>
+</td>
+<td class="py-space-md px-space-md">
+<div class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-surface-container-high text-primary">
+<span class="text-primary font-bold">⊕⊕⊕⊕</span>
+<span class="font-evidence-badge text-evidence-badge uppercase font-semibold">High</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-on-surface-variant text-[12px]">
+                No downgrade. Consistently observed across multi-center PET cohorts with robust assay harmonization.
+              </td>
+</tr>
+<!-- Row 3: ARIA-E -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-space-md px-space-md font-medium">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-error font-semibold">Amyloid-Related Imaging Abnormalities: Edema (ARIA-E)</span>
+<span class="text-on-surface-variant text-[12px]">Safety Endpoint • Incident cases</span>
+</div>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span class="font-semibold text-error">RR 7.41</span>
+<span class="text-on-surface-variant text-[12px] block">(95% CI: 4.88 to 11.25)</span>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span class="text-error font-medium">+109 more per 1,000</span>
+<span class="text-on-surface-variant text-[12px] block">(from 66 more to 174 more)</span>
+</td>
+<td class="py-space-md px-space-md">
+<div class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-surface-container-high text-primary">
+<span class="text-primary font-bold">⊕⊕⊕⊕</span>
+<span class="font-evidence-badge text-evidence-badge uppercase font-semibold">High</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-on-surface-variant text-[12px]">
+                No downgrade. Clear causal mechanism established; high reporting precision with blinded central neuroradiology adjudicators.
+              </td>
+</tr>
+<!-- Row 4: ARIA-H -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-space-md px-space-md font-medium">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Cerebral Microhemorrhages (ARIA-H)</span>
+<span class="text-on-surface-variant text-[12px]">Safety Endpoint • Incident cases</span>
+</div>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span class="font-semibold text-on-surface">RR 1.92</span>
+<span class="text-on-surface-variant text-[12px] block">(95% CI: 1.54 to 2.39)</span>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span>+83 more per 1,000</span>
+<span class="text-on-surface-variant text-[12px] block">(from 49 more to 125 more)</span>
+</td>
+<td class="py-space-md px-space-md">
+<div class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-surface-container text-on-secondary-container">
+<span class="text-primary font-bold">⊕⊕⊕◯</span>
+<span class="font-evidence-badge text-evidence-badge uppercase font-semibold">Moderate</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-on-surface-variant text-[12px]">
+                Downgraded 1 level for imprecision: Heterogeneity in clinical manifestations (isolated petechiae vs symptomatic superficial siderosis).
+              </td>
+</tr>
+<!-- Row 5: All-Cause Mortality -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-space-md px-space-md font-medium">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">All-Cause Serious Adverse Events / Mortality</span>
+<span class="text-on-surface-variant text-[12px]">Systemic safety • 18 months</span>
+</div>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span class="font-semibold text-on-surface">RR 1.04</span>
+<span class="text-on-surface-variant text-[12px] block">(95% CI: 0.62 to 1.74)</span>
+</td>
+<td class="py-space-md px-space-md font-metric-tabular">
+<span>No statistically significant variance observed (0.7% vs 0.8%)</span>
+</td>
+<td class="py-space-md px-space-md">
+<div class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-surface-container text-outline">
+<span class="text-outline font-bold">⊕⊕◯◯</span>
+<span class="font-evidence-badge text-evidence-badge uppercase font-semibold">Low</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-on-surface-variant text-[12px]">
+                Downgraded 2 levels for serious imprecision: Low absolute event counts generate broad confidence intervals crossing clinical boundaries.
+              </td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Systematic GRADE Legend Micro-Bar -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-space-xs text-body-sm text-outline font-body-sm">
+<div class="flex items-center gap-space-md flex-wrap">
+<span class="flex items-center gap-1 text-[12px]"><span class="text-primary font-bold">⊕⊕⊕⊕ High:</span> Further research unlikely to change confidence</span>
+<span class="flex items-center gap-1 text-[12px]"><span class="text-primary font-bold">⊕⊕⊕◯ Moderate:</span> Moderately confident in effect estimate</span>
+<span class="flex items-center gap-1 text-[12px]"><span class="text-outline font-bold">⊕⊕◯◯ Low:</span> Limited confidence in effect estimate</span>
+</div>
+<span class="text-[12px] font-metric-tabular">Standardized GRADE Handbook 2024 Compliance</span>
+</div>
+</div>
+<!-- Section 3 & 4 Dual Stack: Panel Sign-offs & Regulatory Compliance -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+<!-- Section 3: Multidisciplinary Reviewer Panel Sign-offs (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm">
+<span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold">Section 03</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Multidisciplinary Reviewer Sign-Offs</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              Consensus quorum requires minimum 3/4 specialty approvals including Lead Clinical Reviewer.
+            </p>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]">how_to_reg</span>
+</div>
+<!-- 4 Reviewer Rows -->
+<div class="flex flex-col gap-space-md">
+<!-- Reviewer 1: Dr. Sarah Jenkins -->
+<div class="p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<img class="w-11 h-11 rounded-full object-cover shadow-sm flex-shrink-0" data-alt="Professional clinical headshot of Dr Sarah Jenkins, female neurologist medical director with stethoscope, sharp portrait lighting, slate background, serious clinical posture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeu_spaqaErHNMa6J9Ufbp0Vmxf43OCS_j37l7RkF2teQPcHtRbg6LP_IrYevYU-pVxGoDqbBtpaUpk8WSII50yrc7hXT1LrLqCzAUQolJoM_EqrtiU3S4uY1FPgkj55Q33PxFOxh_cRIPcodpQOcg50KeMia9rkmwbV5Gg0lK70Mu6fJT5YLxk5jG44_ZN-QBKT-BPXYk0uCGlv2_ySiFlD-HO5lmSWX8O3kAlu0"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Dr. Sarah Jenkins, MD</span>
+<span class="font-evidence-badge text-evidence-badge bg-surface-container-lowest text-primary px-1.5 py-0.5 rounded font-medium">Lead Reviewer</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Division of Neuro-Oncology & Cognitive Disorders</span>
+<p class="font-body-sm text-body-sm text-on-surface mt-1 italic">
+                  “Approved with Caveats: Recommend strict institutional MRI monitoring protocol at baseline, 5th, 7th, and 14th doses.”
+                </p>
+</div>
+</div>
+<div class="flex flex-col md:items-end flex-shrink-0">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm font-semibold">Approved w/ Caveats</span>
+</div>
+<span class="font-evidence-badge text-evidence-badge text-outline mt-1 font-metric-tabular">Oct 24, 2024 • 09:14 EST</span>
+</div>
+</div>
+<!-- Reviewer 2: Dr. Marcus Vance -->
+<div class="p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<img class="w-11 h-11 rounded-full object-cover shadow-sm flex-shrink-0" data-alt="Professional headshot of Dr Marcus Vance, male clinical pharmacologist in smart professional lab attire, calm expression, neutral medical institute background, clinical lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8F32Zpsf1L_0KY-g5X-Ic4pujsx_eNK9jXWS_h8d2vYJKIVayAKo5QpzveZcX81q6zx0X39aDHfd8zaQA_VNnCkC_sszMFuJe4aYTpsCVsV3oCYsashZ_hA1wmos6tUNGcSeJScuUbttRibhKV6uedE7bxeqiR8_w6m8Vb_zdXxAdt9rkhJk0NNNm_bCrRtIyiTrChATgEHx2CsR3yy7ARQOUpe-nPxlv3Rw6XMw"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Dr. Marcus Vance, PharmD</span>
+<span class="font-evidence-badge text-evidence-badge bg-surface-container-lowest text-outline px-1.5 py-0.5 rounded font-medium">Pharmacotherapy</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Clinical Pharmacotherapy & Biologics Evaluation</span>
+<p class="font-body-sm text-body-sm text-on-surface mt-1 italic">
+                  “Approved: Dosing titration schedules and anti-drug antibody kinetics verified within allowable variance.”
+                </p>
+</div>
+</div>
+<div class="flex flex-col md:items-end flex-shrink-0">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm font-semibold">Approved</span>
+</div>
+<span class="font-evidence-badge text-evidence-badge text-outline mt-1 font-metric-tabular">Oct 23, 2024 • 17:42 EST</span>
+</div>
+</div>
+<!-- Reviewer 3: Dr. Elena Rostova -->
+<div class="p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<img class="w-11 h-11 rounded-full object-cover shadow-sm flex-shrink-0" data-alt="Professional medical portrait of Dr Elena Rostova, female senior biostatistician with glasses, focused expression, hospital informatics library background, clean modern clinical style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbptFwBOrexHK61qH3yOJvAw5BZJEdXtEGNjdWxG17XCkrTKJUEc3nDLyc4D67iejAwAPJP5R-809R2FQmVb4rIowly5belxOZ1oA28dEiQ0iA_KJIIfEPg5fK6k5wfxIKcyvE9GMkoaScoVzHozTmtjCtKaRKbnOXsKK0KkHfkQKoGBZzXrhY9ARj_SgfrtdrGiYe0vUxq1UQYv8stzMVyZVTYoK_txGKZz8w8qQ"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Dr. Elena Rostova, PhD</span>
+<span class="font-evidence-badge text-evidence-badge bg-surface-container-lowest text-outline px-1.5 py-0.5 rounded font-medium">Biostatistics</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Methodology & Meta-Analytical Science</span>
+<p class="font-body-sm text-body-sm text-on-surface mt-1 italic">
+                  “Approved: Statistical power and hazard ratios verified; meta-regression exhibits acceptable baseline balance.”
+                </p>
+</div>
+</div>
+<div class="flex flex-col md:items-end flex-shrink-0">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm font-semibold">Approved</span>
+</div>
+<span class="font-evidence-badge text-evidence-badge text-outline mt-1 font-metric-tabular">Oct 23, 2024 • 14:10 EST</span>
+</div>
+</div>
+<!-- Reviewer 4: Dr. Alan Weiss -->
+<div class="p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<img class="w-11 h-11 rounded-full object-cover shadow-sm flex-shrink-0" data-alt="Professional clinical headshot of Dr Alan Weiss, senior male physician ethics committee chair, thoughtful expression, university medical center office setting, muted slate tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYF21DLBKdFHVFx9nrw5dB0RD9LthZsrLQA004RkV3IRLtBE9mhFICAe3YYTk1b3oIyN-yw1e9mkpD7sgAkjjoyzfy3h-iroJ6rA76Nb-TdsiRvnS_KoLUp3GHY8DNlZm3vFOnGAICjc3NuwvfBBdfUzNpHYb7sIMAWqgW0RzxPSkSgz8LySMkd8qslMqjbV77DiI2-28AfksDavbgQfmIK8dZ72x8nZhaqjcG9xU"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Dr. Alan Weiss, MD</span>
+<span class="font-evidence-badge text-evidence-badge bg-surface-container-lowest text-outline px-1.5 py-0.5 rounded font-medium">Ethics & Formulary</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Hospital Formulary & Medical Ethics Committee</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 italic">
+                  “Under Review: Evaluating cost-utility ICER ratios relative to required bi-weekly infusion center capacity.”
+                </p>
+</div>
+</div>
+<div class="flex flex-col md:items-end flex-shrink-0">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-highest text-on-surface">
+<span class="w-2 h-2 rounded-full bg-outline animate-ping"></span>
+<span class="font-label-sm text-label-sm font-semibold">Under Review</span>
+</div>
+<span class="font-evidence-badge text-evidence-badge text-outline mt-1 font-metric-tabular">Pending Session Oct 26</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 4: Conflict of Interest & Regulatory Verification (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-lg">
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold">Section 04</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Regulatory & Compliance</h3>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]">verified_user</span>
+</div>
+<!-- Dual Compliance Certificates -->
+<div class="flex flex-col gap-space-md">
+<!-- Certificate 1: 21 CFR Part 11 -->
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">encrypted</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">FDA 21 CFR Part 11 Digital Trail</span>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container font-evidence-badge text-evidence-badge text-primary uppercase font-bold">Compliant</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Every reviewer revision, commentary commit, and timestamp token is cryptographically signed using SHA-256 HMAC protocols. Tamper-evident blockchain state anchored to evaluation hash:
+              </p>
+<div class="bg-surface-container-lowest p-2 rounded font-metric-tabular text-[11px] text-outline select-all break-all mt-1">
+                SHA256: 8f3c4e61d8a01b228f4cc44510b0a23e9a117b1897c558c494bb90479fdfa732
+              </div>
+</div>
+<!-- Certificate 2: Conflict of Interest -->
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">gavel</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Conflict of Interest (COI) Audit</span>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container font-evidence-badge text-evidence-badge text-primary uppercase font-bold">Zero Conflicts</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                All 4 multidisciplinary committee members executed mandatory Sunshine Act disclosure certificates. Zero active advisory, equity, or commercial consulting ties to Biogen, Eisai, or Eli Lilly declared for the 36-month lookback period.
+              </p>
+</div>
+<!-- Certificate 3: HIPAA Audit -->
+<div class="p-space-md rounded-lg bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[22px]">policy</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">HIPAA Safe Harbor De-Identification</span>
+<span class="font-evidence-badge text-evidence-badge text-outline">Clinical Cohort Records: 3,531 Synthetic Enrollees</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+</div>
+</div>
+<!-- Digital Attestation Footnote -->
+<div class="p-space-md rounded-lg bg-surface-container flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-outline text-[18px] mt-0.5">lock_clock</span>
+<div class="flex flex-col text-on-surface-variant text-[12px] font-body-sm leading-tight">
+<span>Electronic Sign-off Seal: Registered under Clinical Protocol Directory ID #4029-A. Official digital artifact valid for Joint Commission and CMS Formulary Review submissions.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive Slide-over / Modal for Audit History Log (Hidden by default, triggered via JS) -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/40 backdrop-blur-[2px] hidden items-center justify-center p-space-md transition-opacity" id="audit-log-modal">
+<div class="bg-surface-container-lowest rounded-xl shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+<div class="p-space-lg bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[22px]">history</span>
+<div class="flex flex-col">
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Audit History & Immutable Log</h4>
+<span class="font-evidence-badge text-evidence-badge text-outline">Evaluation Dossier #EVAL-CONSENSUS-2024-0412</span>
+</div>
+</div>
+<button class="p-1 rounded hover:bg-surface-container-highest text-on-surface-variant transition-colors" id="close-audit-modal" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="p-space-lg overflow-y-auto space-y-space-md font-body-sm text-body-sm">
+<div class="flex items-start gap-space-md">
+<span class="w-2.5 h-2.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Dr. Sarah Jenkins affixed digital sign-off with caveats</span>
+<span class="font-evidence-badge text-evidence-badge text-outline">Today, 09:14 EST</span>
+</div>
+<p class="text-on-surface-variant mt-0.5">Clause appended: MRI 3T surveillance requirement added to hospital orderset template.</p>
+</div>
+</div>
+<div class="flex items-start gap-space-md">
+<span class="w-2.5 h-2.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Dr. Marcus Vance approved pharmacokinetics dossier</span>
+<span class="font-evidence-badge text-evidence-badge text-outline">Yesterday, 17:42 EST</span>
+</div>
+<p class="text-on-surface-variant mt-0.5">Bi-weekly weight-based dosage titration approved without adjustments.</p>
+</div>
+</div>
+<div class="flex items-start gap-space-md">
+<span class="w-2.5 h-2.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">GRADE Evidence Matrix Updated to v2.1</span>
+<span class="font-evidence-badge text-evidence-badge text-outline">Oct 23, 14:10 EST</span>
+</div>
+<p class="text-on-surface-variant mt-0.5">Dr. Elena Rostova incorporated pooled Forest Plot and meta-regression numbers.</p>
+</div>
+</div>
+<div class="flex items-start gap-space-md">
+<span class="w-2.5 h-2.5 rounded-full bg-outline-variant mt-1.5 flex-shrink-0"></span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Consensus Dossier Initiated</span>
+<span class="font-evidence-badge text-evidence-badge text-outline">Oct 20, 10:00 EST</span>
+</div>
+<p class="text-on-surface-variant mt-0.5">Automated ingestion from ClinicalTrials.gov and PubMed Central.</p>
+</div>
+</div>
+</div>
+<div class="p-space-md bg-surface-container-low flex justify-end">
+<button class="px-space-md py-1.5 bg-surface-container-lowest hover:bg-surface-container rounded text-on-surface font-label-md text-label-md transition-colors shadow-sm" id="close-audit-modal-btn" type="button">
+          Close Audit Viewer
+        </button>
+</div>
+</div>
+</div>
+<!-- Toast Notification Template -->
+<div class="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-space-lg py-space-md rounded-lg shadow-xl flex items-center gap-space-sm transform translate-y-24 opacity-0 transition-all duration-300" id="consensus-toast">
+<span class="material-symbols-outlined text-primary-fixed-dim text-[20px]" id="toast-icon">check_circle</span>
+<span class="font-label-md text-label-md" id="toast-msg">Digital Signature Affixed</span>
+</div>
+</div>
+<script>
+  (function() {
+    const modal = document.getElementById('audit-log-modal');
+    const openBtn = document.getElementById('audit-log-btn');
+    const closeBtn = document.getElementById('close-audit-modal');
+    const closeBtn2 = document.getElementById('close-audit-modal-btn');
+    const toast = document.getElementById('consensus-toast');
+    const toastMsg = document.getElementById('toast-msg');
+
+    function showToast(text, icon = 'check_circle') {
+      if (!toast) return;
+      toastMsg.textContent = text;
+      const toastIcon = document.getElementById('toast-icon');
+      if (toastIcon) toastIcon.textContent = icon;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3500);
+    }
+
+    if (openBtn && modal) {
+      openBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      });
+    }
+
+    function closeModal() {
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (closeBtn2) closeBtn2.addEventListener('click', closeModal);
+
+    const signoffBtn = document.getElementById('signoff-modal-btn');
+    if (signoffBtn) {
+      signoffBtn.addEventListener('click', () => {
+        showToast('Digital Signature Key Verified (Dr. Sarah Jenkins, MD) - Logged to Audit Trail', 'verified');
+      });
+    }
+
+    const exportBtn = document.getElementById('export-pdf-btn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        showToast('Generating Publication PDF with GRADE profiles & cryptographic watermark...', 'downloading');
+      });
+    }
+
+    const shareBtn = document.getElementById('share-committee-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', () => {
+        showToast('Secure link dispatched to 14 Hospital Formulary Committee members', 'forward_to_inbox');
+      });
+    }
+  })();
+</script></main><footer class="w-full bg-surface-container-lowest shadow-[0_-1px_8px_rgba(0,0,0,0.02)] mt-auto"><div class="w-full px-margin-lg py-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><span class="font-label-sm text-label-sm text-outline">AevitasMed Clinical Decision Protocol v3.4</span><span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-label-sm text-label-sm text-outline">Systematic GRADE Evaluation Framework</span></div><div class="flex items-center gap-space-lg"><span class="font-evidence-badge text-evidence-badge text-on-surface-variant uppercase">Data Classification: Restricted Clinical</span><span class="font-label-sm text-label-sm text-outline">© 2025 Aevitas Medical Informatics LLC</span></div></div></footer></body></html>

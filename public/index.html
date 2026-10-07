@@ -187,8 +187,8 @@
             <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
             <span class="text-on-surface-variant">Clinical Evidence Engine</span>
             <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
-            <span class="text-primary font-semibold">#EVAL-CONSENSUS-2024-0412</span>
-            <span class="ml-space-sm px-space-sm py-0.5 rounded bg-surface-container font-evidence-badge text-evidence-badge text-primary uppercase">v2.1 Active</span>
+            <span class="text-primary font-semibold" id="topDossierRef">#EVAL-CLINICAL-ACTIVE</span>
+            <span class="ml-space-sm px-space-sm py-0.5 rounded bg-surface-container font-evidence-badge text-evidence-badge text-primary uppercase" id="topStatusPill">Live Engine</span>
           </div>
           <div class="flex items-center gap-space-sm flex-wrap">
             <button class="h-9 px-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors shadow-sm" id="audit-log-btn" type="button">
@@ -290,260 +290,192 @@
             <p id="status" class="font-label-md text-label-md text-on-surface flex-1 m-0"></p>
           </div>
 
-          <!-- Dynamic Output Container -->
-          <div id="outputSection" class="hidden flex flex-col gap-space-sm pt-space-xs">
-            <div class="flex items-center justify-between flex-wrap gap-space-xs">
-              <div class="flex items-center gap-space-xs">
-                <span class="material-symbols-outlined text-[20px] text-primary">clinical_notes</span>
-                <span class="font-headline-sm text-headline-sm text-on-surface font-semibold" id="outputTitle">Synthesis Findings</span>
-              </div>
-              <div id="actions" class="flex items-center gap-space-xs" style="display: none;">
-                <button id="copyBtn" type="button" class="h-8 px-space-sm rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1 transition-colors">
-                  <span class="material-symbols-outlined text-[16px]">content_copy</span>
-                  <span>Copy</span>
-                </button>
-                <button id="downloadBtn" type="button" class="h-8 px-space-md rounded bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm flex items-center gap-1 transition-all shadow-sm">
-                  <span class="material-symbols-outlined text-[16px]">download</span>
-                  <span>Download Summary</span>
-                </button>
-              </div>
-            </div>
-            <pre id="out" class="whitespace-pre-wrap font-body-md text-body-md text-on-surface bg-surface-container-low border border-outline-variant/40 rounded-lg p-space-lg max-h-[550px] overflow-y-auto leading-relaxed font-sans shadow-inner"></pre>
-          </div>
-
           <p class="text-outline font-body-sm text-[12px] m-0">
             <small>For informational purposes only; not medical advice.</small>
           </p>
         </div>
 
-        <!-- Header Clinical Dossier Card (Stitch Reference Panel) -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg">
-          <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-space-lg">
-            <div class="flex flex-col gap-space-xs max-w-4xl">
-              <div class="flex items-center gap-space-sm flex-wrap">
-                <span class="px-space-sm py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-evidence-badge text-evidence-badge tracking-wider uppercase font-semibold">GRADE Standard Assessment</span>
-                <span class="text-outline text-label-sm font-label-sm">Published: October 24, 2024</span>
-                <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-                <span class="text-outline text-label-sm font-label-sm">Protocol Ref: NCT03887455 / NCT04437511</span>
-              </div>
-              <h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1">
-                Clinical Evidence Consensus Memo: Anti-Amyloid Monoclonal Antibodies in Early-Stage Alzheimer’s Disease
-              </h2>
-              <p class="font-body-md text-body-md text-on-surface-variant">
-                Targeting Amyloid-Beta oligomers and protofibrils (Lecanemab &amp; Donanemab) in Mild Cognitive Impairment (MCI) and Mild Dementia due to AD. Comprehensive GRADE appraisal synthesized for Formulary and Therapeutics Committee governance.
-              </p>
-            </div>
-            <div class="flex xl:flex-col items-center xl:items-end justify-between gap-space-md bg-surface-container-low p-space-md rounded-lg flex-shrink-0">
-              <div class="flex flex-col xl:text-right">
-                <span class="font-evidence-badge text-evidence-badge text-outline uppercase">Consensus Status</span>
-                <span class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1 xl:justify-end">
-                  <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                  3 of 4 Signatures Affixed
-                </span>
-              </div>
-              <div class="flex flex-col xl:text-right">
-                <span class="font-evidence-badge text-evidence-badge text-outline uppercase">GRADE Certainty</span>
-                <div class="flex items-center gap-1 text-primary">
-                  <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
-                  <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
-                  <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
-                  <span class="material-symbols-outlined text-[16px] text-outline-variant">circle</span>
-                  <span class="font-label-sm text-label-sm font-semibold ml-1 text-on-surface">Moderate (⊕⊕⊕⭘)</span>
-                </div>
-              </div>
-            </div>
+        <!-- Initial Ready Card (Shown before document ingestion) -->
+        <div id="readyCard" class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col items-center justify-center text-center gap-space-sm border border-dashed border-outline-variant/60 py-16">
+          <div class="w-16 h-16 rounded-full bg-surface-container-low text-primary flex items-center justify-center shadow-sm mb-2">
+            <span class="material-symbols-outlined text-[36px]">clinical_notes</span>
           </div>
+          <h3 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">
+            Ready for Clinical Document Ingestion
+          </h3>
+          <p class="font-body-md text-body-md text-on-surface-variant max-w-lg">
+            Upload a medical PDF report above and select <strong>Summarize</strong> or <strong>Evaluate</strong>. The clinical findings, diagnoses, medications, and recommendations will be dynamically rendered in the GRADE Standard Assessment format below.
+          </p>
+        </div>
 
-          <!-- Consensus Grade Banner -->
-          <div class="rounded-lg bg-surface-container p-space-lg flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg">
-            <div class="flex items-start gap-space-md">
-              <div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
-                <span class="material-symbols-outlined text-[28px]">fact_check</span>
-              </div>
-              <div class="flex flex-col">
+        <!-- Dynamic GRADE Standard Assessment Dossier Card (Rendered upon analysis) -->
+        <div id="assessmentContainer" class="hidden flex flex-col gap-space-xl">
+
+          <!-- Header Clinical Dossier Card -->
+          <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg border border-outline-variant/30">
+            <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-space-lg">
+              <div class="flex flex-col gap-space-xs max-w-4xl">
                 <div class="flex items-center gap-space-sm flex-wrap">
-                  <span class="font-evidence-badge text-evidence-badge uppercase tracking-wider text-on-secondary-container bg-surface-container-lowest px-2 py-0.5 rounded shadow-sm">Formal Verdict</span>
-                  <span class="font-label-sm text-label-sm text-outline">Clinical Practice Guideline Level 2A</span>
+                  <span id="assessmentBadge" class="px-space-sm py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-evidence-badge text-evidence-badge tracking-wider uppercase font-semibold">GRADE Standard Assessment</span>
+                  <span id="assessmentDate" class="text-outline text-label-sm font-label-sm"></span>
+                  <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+                  <span id="assessmentFileRef" class="text-outline text-label-sm font-label-sm"></span>
                 </div>
-                <h3 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight mt-0.5">
-                  FINAL RECOMMENDATION: Conditional Clinical Adoption
-                </h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant max-w-3xl mt-0.5">
-                  Recommended for strictly screened ApoE4-genotyped candidates with documented amyloid biomarker positivity. Mandates rigorous baseline and quarterly 3T-MRI monitoring protocols for ARIA surveillance.
-                </p>
+                <h2 id="assessmentTitle" class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1"></h2>
+                <p id="assessmentPatientSummary" class="font-body-md text-body-md text-on-surface-variant leading-relaxed"></p>
               </div>
-            </div>
-            <div class="flex items-center gap-space-md flex-shrink-0 flex-wrap">
-              <div class="flex flex-col bg-surface-container-lowest px-space-md py-space-sm rounded shadow-sm">
-                <span class="font-evidence-badge text-evidence-badge text-outline uppercase">Efficacy Deceleration</span>
-                <div class="flex items-baseline gap-1 mt-0.5">
-                  <span class="font-display-lg text-display-lg text-primary font-semibold tracking-tight">-27%</span>
-                  <span class="font-label-sm text-label-sm text-on-surface-variant">vs Placebo</span>
-                </div>
-                <span class="font-evidence-badge text-evidence-badge text-outline">CDR-SB at 18 months</span>
-              </div>
-              <div class="flex flex-col bg-surface-container-lowest px-space-md py-space-sm rounded shadow-sm">
-                <span class="font-evidence-badge text-evidence-badge text-error uppercase">Safety Risk (ARIA-E)</span>
-                <div class="flex items-baseline gap-1 mt-0.5">
-                  <span class="font-display-lg text-display-lg text-error font-semibold tracking-tight">12.6%</span>
-                  <span class="font-label-sm text-label-sm text-on-surface-variant">All Patients</span>
-                </div>
-                <span class="font-evidence-badge text-evidence-badge text-outline">32.6% in ApoE4 Homozygotes</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Section 1 & Data Visualization Bento Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
-          <!-- Section 1: Executive Summary & Synthesized Findings (7 cols) -->
-          <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-md">
-            <div class="flex items-center justify-between pb-space-sm">
-              <div class="flex items-center gap-space-sm">
-                <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold">Section 01</span>
-                <h3 class="font-headline-md text-headline-md text-on-surface">Executive Summary &amp; Synthesized Findings</h3>
-              </div>
-              <span class="material-symbols-outlined text-outline text-[20px]">medical_information</span>
-            </div>
-            <div class="space-y-space-md text-on-surface font-body-md text-body-md leading-relaxed">
-              <p>
-                The systematic appraisal encompassing two pivotal Phase 3 randomized, double-blind, placebo-controlled trials (Clarity AD, n=1,795; TRAILBLAZER-ALZ 2, n=1,736) demonstrates a statistically significant slowing of cognitive and functional decline in patients with confirmed early-stage Alzheimer’s disease receiving monoclonal anti-amyloid therapy compared to placebo over 18 months.
-              </p>
-              <div class="bg-surface-container-low rounded-lg p-space-md flex flex-col gap-space-sm">
-                <div class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-space-xs">
-                  <span class="material-symbols-outlined text-[16px] text-primary">insights</span>
-                  Primary Cognitive Endpoint: CDR-SB Difference
+              <!-- Quick Summary Micro-Widget -->
+              <div class="flex xl:flex-col items-center xl:items-end justify-between gap-space-md bg-surface-container-low p-space-md rounded-lg flex-shrink-0">
+                <div class="flex flex-col xl:text-right">
+                  <span class="font-evidence-badge text-evidence-badge text-outline uppercase">Synthesis Status</span>
+                  <span id="assessmentModeStatus" class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1 xl:justify-end">
+                    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                    FAST Engine
+                  </span>
                 </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">
-                  Across pooled analysis, the mean change in Clinical Dementia Rating–Sum of Boxes (CDR-SB) exhibited a favorable difference of <span class="font-metric-tabular text-on-surface font-semibold">-0.45 points (95% CI: -0.67 to -0.23, p &lt; 0.001)</span>. Secondary endpoints, including ADAS-Cog14 and ADCS-MCI-ADL, yielded congruent deceleration trajectories (-1.44 points and +1.20 points, respectively).
-                </p>
+                <div class="flex flex-col xl:text-right">
+                  <span class="font-evidence-badge text-evidence-badge text-outline uppercase">GRADE Certainty</span>
+                  <div class="flex items-center gap-1 text-primary">
+                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+                    <span class="font-label-sm text-label-sm font-semibold ml-1 text-on-surface">Validated (⊕⊕⊕⊕)</span>
+                  </div>
+                </div>
               </div>
-              <p>
-                Despite validated bio-efficacy in cortical amyloid clearance, substantial adverse safety signals dictate circumspect clinical adoption. Amyloid-Related Imaging Abnormalities with edema/effusion (ARIA-E) were reported in 12.6% of patients on active agent versus 1.7% in placebo cohorts. Intracerebral microhemorrhages and hemosiderosis (ARIA-H) occurred in 17.3% versus 9.0%.
-              </p>
             </div>
-          </div>
 
-          <!-- Section 1 Visual Complement: Forest Plot Graphic (5 cols) -->
-          <div class="lg:col-span-5 flex flex-col gap-space-lg">
-            <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
-              <div class="flex items-center justify-between">
+            <!-- Consensus Grade / Recommendation Banner -->
+            <div id="verdictBanner" class="rounded-lg bg-surface-container p-space-lg flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg">
+              <div class="flex items-start gap-space-md">
+                <div class="w-12 h-12 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <span class="material-symbols-outlined text-[28px]" id="verdictIcon">fact_check</span>
+                </div>
                 <div class="flex flex-col">
-                  <span class="font-evidence-badge text-evidence-badge text-outline uppercase tracking-wider">GRADE Meta-Analysis Estimate</span>
-                  <h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">CDR-SB Mean Difference (Forest Plot)</h4>
-                </div>
-                <span class="font-evidence-badge text-evidence-badge bg-surface-container text-on-secondary-container px-2 py-0.5 rounded">p &lt; 0.001</span>
-              </div>
-              <div class="bg-surface-container-low rounded-lg p-space-md flex flex-col gap-space-sm">
-                <div class="flex justify-between font-label-sm text-label-sm text-outline px-2">
-                  <span>Favors Active (-1.0)</span>
-                  <span>Null (0.0)</span>
-                  <span>Favors Placebo (+0.5)</span>
-                </div>
-                <svg class="w-full h-36" fill="none" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
-                  <line stroke="#707881" stroke-dasharray="3 3" stroke-width="1.5" x1="240" x2="240" y1="5" y2="125"></line>
-                  <line stroke="#bfc7d2" stroke-width="1" x1="50" x2="360" y1="125" y2="125"></line>
-                  <line stroke="#707881" x1="100" x2="100" y1="122" y2="128"></line>
-                  <line stroke="#707881" x1="170" x2="170" y1="122" y2="128"></line>
-                  <line stroke="#707881" x1="240" x2="240" y1="122" y2="128"></line>
-                  <line stroke="#707881" x1="310" x2="310" y1="122" y2="128"></line>
-                  <text class="font-body-sm text-[11px]" fill="#3f4850" x="15" y="28">Clarity AD (n=1,795)</text>
-                  <line stroke="#006194" stroke-width="2" x1="130" x2="205" y1="25" y2="25"></line>
-                  <rect fill="#006194" height="8" rx="1" width="8" x="162" y="21"></rect>
-                  <text class="font-body-sm text-[11px]" fill="#3f4850" x="15" y="65">TRAILBLAZER (n=1,736)</text>
-                  <line stroke="#006194" stroke-width="2" x1="120" x2="195" y1="62" y2="62"></line>
-                  <rect fill="#006194" height="8" rx="1" width="8" x="153" y="58"></rect>
-                  <text class="font-label-sm text-[11px] font-semibold" fill="#111c2d" x="15" y="103">GRADE Pooled Diamond</text>
-                  <polygon fill="#007bb9" points="152,100 167,95 182,100 167,105"></polygon>
-                  <line stroke="#007bb9" stroke-width="2" x1="145" x2="189" y1="100" y2="100"></line>
-                </svg>
-                <div class="flex items-center justify-between text-label-sm font-label-sm pt-space-xs text-on-surface-variant">
-                  <span>Overall Effect: MD -0.45 [95% CI: -0.67, -0.23]</span>
-                  <span class="font-metric-tabular text-on-surface font-semibold">I² = 0.0% (Homogeneous)</span>
+                  <div class="flex items-center gap-space-sm flex-wrap">
+                    <span class="font-evidence-badge text-evidence-badge uppercase tracking-wider text-on-secondary-container bg-surface-container-lowest px-2 py-0.5 rounded shadow-sm" id="verdictBadgeText">Formal Verdict</span>
+                    <span class="font-label-sm text-label-sm text-outline">Clinical Practice Guidance</span>
+                  </div>
+                  <h3 id="assessmentVerdict" class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight mt-0.5"></h3>
+                  <p id="assessmentVerdictDetails" class="font-body-sm text-body-sm text-on-surface-variant max-w-3xl mt-0.5"></p>
                 </div>
               </div>
 
-              <!-- ARIA Risk Stratification Breakdown -->
-              <div class="grid grid-cols-2 gap-space-sm pt-space-xs">
-                <div class="p-space-sm bg-surface-container rounded flex flex-col">
-                  <span class="font-evidence-badge text-evidence-badge text-outline uppercase">Non-Carriers</span>
-                  <span class="font-metric-tabular text-headline-sm text-on-surface font-bold">5.4%</span>
-                  <span class="text-body-sm text-on-surface-variant text-[11px]">Mild Edema / Transient</span>
+              <!-- Action Bar with Download Button -->
+              <div id="actions" class="flex items-center gap-space-xs flex-wrap flex-shrink-0">
+                <button id="copyBtn" type="button" class="h-9 px-space-md rounded bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1 transition-colors shadow-sm">
+                  <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                  <span>Copy</span>
+                </button>
+                <button id="downloadBtn" type="button" class="h-9 px-space-md rounded bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1 transition-all shadow-md">
+                  <span class="material-symbols-outlined text-[18px]">download</span>
+                  <span>Download Summary</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 01 & Clinical Findings Bento Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+            <!-- Section 01: Executive Summary & Synthesized Findings (7 cols) -->
+            <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-md border border-outline-variant/30">
+              <div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+                <div class="flex items-center gap-space-sm">
+                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold uppercase">Section 01</span>
+                  <h3 class="font-headline-md text-headline-md text-on-surface">Executive Summary &amp; Synthesized Findings</h3>
                 </div>
-                <div class="p-space-sm bg-error-container/40 rounded flex flex-col">
-                  <span class="font-evidence-badge text-evidence-badge text-error uppercase font-semibold">Homozygotes (ε4/ε4)</span>
-                  <span class="font-metric-tabular text-headline-sm text-error font-bold">32.6%</span>
-                  <span class="text-body-sm text-on-error-container text-[11px]">High ARIA-E / Severe</span>
+                <span class="material-symbols-outlined text-outline text-[20px]">medical_information</span>
+              </div>
+
+              <div class="flex flex-col gap-space-md text-on-surface font-body-md text-body-md leading-relaxed">
+                <div>
+                  <span class="font-label-md text-label-md text-outline uppercase font-semibold">Document Overview</span>
+                  <p id="assessmentOverview" class="text-on-surface font-body-md text-body-md leading-relaxed mt-1"></p>
+                </div>
+
+                <!-- Key Findings Container -->
+                <div class="flex flex-col gap-space-sm pt-space-xs">
+                  <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[18px] text-primary">insights</span>
+                    <span>Key Findings</span>
+                  </span>
+                  <div id="assessmentKeyFindings" class="flex flex-col gap-space-xs"></div>
+                </div>
+
+                <!-- Next Courses of Action (prominent for evaluate mode) -->
+                <div id="nextActionsContainer" class="hidden p-space-md rounded-lg bg-surface-container-low border border-primary/20 flex flex-col gap-space-xs">
+                  <div class="flex items-center gap-space-xs text-primary font-label-md text-label-md font-semibold">
+                    <span class="material-symbols-outlined text-[20px]">lightbulb</span>
+                    <span>Recommended Next Courses of Action</span>
+                  </div>
+                  <p id="assessmentNextActions" class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed"></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Diagnoses, Medications, Follow-up Bento (5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-space-lg">
+              <!-- Diagnoses / Conditions Card -->
+              <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
+                <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
+                  <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[18px] text-primary">stethoscope</span>
+                    <span>Diagnoses &amp; Conditions</span>
+                  </span>
+                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-on-secondary-container px-2 py-0.5 rounded uppercase font-semibold">Identified</span>
+                </div>
+                <div id="assessmentDiagnoses" class="flex flex-wrap gap-1.5 pt-1"></div>
+              </div>
+
+              <!-- Medications / Therapies Card -->
+              <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
+                <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
+                  <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[18px] text-secondary">medication</span>
+                    <span>Medications &amp; Therapies</span>
+                  </span>
+                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-outline px-2 py-0.5 rounded uppercase font-semibold">Documented</span>
+                </div>
+                <div id="assessmentMedications" class="flex flex-wrap gap-1.5 pt-1"></div>
+              </div>
+
+              <!-- Recommended Follow-up Card -->
+              <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
+                <div class="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
+                  <span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[18px] text-tertiary">calendar_clock</span>
+                    <span>Recommended Follow-up</span>
+                  </span>
+                  <span class="font-evidence-badge text-evidence-badge bg-surface-container text-outline px-2 py-0.5 rounded uppercase font-semibold">Clinical Plan</span>
+                </div>
+                <p id="assessmentFollowUp" class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed pt-1"></p>
+              </div>
+
+              <!-- AI Safety Notice -->
+              <div class="p-space-md rounded-lg bg-surface-container-low border border-outline-variant/30 flex items-start gap-space-sm">
+                <span class="material-symbols-outlined text-outline text-[20px] mt-0.5">info</span>
+                <div class="flex flex-col text-[12px] font-body-sm text-on-surface-variant">
+                  <span class="font-semibold text-on-surface">Clinical Evidence Advisory</span>
+                  <span>AI-generated synthesis. Informational purposes only; not a substitute for clinical judgment.</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Section 2: Summary of Findings Table (GRADE Evidence Profile) -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
-            <div class="flex flex-col">
-              <div class="flex items-center gap-space-sm">
-                <span class="font-evidence-badge text-evidence-badge bg-surface-container text-primary px-2 py-0.5 rounded font-semibold">Section 02</span>
-                <h3 class="font-headline-md text-headline-md text-on-surface">Summary of Findings Table: GRADE Evidence Profile</h3>
-              </div>
-              <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
-                Patients: Mild Cognitive Impairment (MCI) or Mild AD &bull; Intervention: Anti-Amyloid mAb Therapy &bull; Comparator: Placebo &bull; Setting: Outpatient Infusion Centers
-              </p>
-            </div>
-            <div class="flex items-center gap-space-xs flex-wrap">
-              <button class="px-space-md py-1 bg-surface-container-low hover:bg-surface-container rounded text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1" type="button">
-                <span class="material-symbols-outlined text-[16px]">filter_list</span>
-                <span>All 5 Endpoints</span>
+          <!-- Raw Text / JSON Inspector -->
+          <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-sm border border-outline-variant/30">
+            <div class="flex items-center justify-between">
+              <span class="font-label-md text-label-md text-outline font-semibold uppercase tracking-wider">Raw Output Inspector</span>
+              <button id="toggleRawBtn" type="button" class="text-primary hover:underline font-label-sm text-label-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">terminal</span>
+                <span id="toggleRawText">Show Raw Text</span>
               </button>
             </div>
+            <pre id="out" class="hidden whitespace-pre-wrap font-body-sm text-body-sm text-on-surface bg-surface-container-low border border-outline-variant/40 rounded-lg p-space-md max-h-[350px] overflow-y-auto leading-relaxed shadow-inner"></pre>
           </div>
 
-          <div class="w-full overflow-x-auto rounded-lg shadow-sm">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase tracking-wider">
-                  <th class="py-space-md px-space-md">Clinical Outcome</th>
-                  <th class="py-space-md px-space-md">Relative Effect (95% CI)</th>
-                  <th class="py-space-md px-space-md">Anticipated Absolute Risk Difference</th>
-                  <th class="py-space-md px-space-md">Certainty of Evidence (GRADE)</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-surface-container-high font-body-sm text-body-sm text-on-surface">
-                <tr class="hover:bg-surface-container-low/50 transition-colors">
-                  <td class="py-space-md px-space-md font-medium">Cognitive &amp; Functional Decline (CDR-SB)</td>
-                  <td class="py-space-md px-space-md font-metric-tabular text-primary font-semibold">MD -0.45 (-0.67 to -0.23)</td>
-                  <td class="py-space-md px-space-md">0.45 points slower progression on 18-point scale</td>
-                  <td class="py-space-md px-space-md">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-primary font-semibold text-xs">
-                      ⊕⊕⊕⭘ Moderate
-                    </span>
-                  </td>
-                </tr>
-                <tr class="hover:bg-surface-container-low/50 transition-colors">
-                  <td class="py-space-md px-space-md font-medium">Amyloid Plaque Burden (PET Centiloids)</td>
-                  <td class="py-space-md px-space-md font-metric-tabular text-primary font-semibold">MD -59.12 CL</td>
-                  <td class="py-space-md px-space-md">68% of treated patients achieved amyloid-negative status</td>
-                  <td class="py-space-md px-space-md">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-semibold text-xs">
-                      ⊕⊕⊕⊕ High
-                    </span>
-                  </td>
-                </tr>
-                <tr class="hover:bg-surface-container-low/50 transition-colors">
-                  <td class="py-space-md px-space-md font-medium text-error">ARIA Edema / Effusion (ARIA-E)</td>
-                  <td class="py-space-md px-space-md font-metric-tabular text-error font-semibold">RR 7.41 (4.88 to 11.25)</td>
-                  <td class="py-space-md px-space-md text-error">+109 more per 1,000 enrollees</td>
-                  <td class="py-space-md px-space-md">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-semibold text-xs">
-                      ⊕⊕⊕⊕ High
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
 
       </div>
@@ -558,7 +490,7 @@
           <span class="material-symbols-outlined text-primary text-[22px]">history</span>
           <div class="flex flex-col">
             <h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Audit History &amp; Immutable Log</h4>
-            <span class="font-evidence-badge text-evidence-badge text-outline">Evaluation Dossier #EVAL-CONSENSUS-2024-0412</span>
+            <span class="font-evidence-badge text-evidence-badge text-outline">Clinical Document Studio</span>
           </div>
         </div>
         <button class="p-1 rounded hover:bg-surface-container-highest text-on-surface-variant transition-colors" id="close-audit-modal" type="button">
@@ -600,8 +532,8 @@
             o = document.getElementById('out'),
             statusWrapper = document.getElementById('statusWrapper'),
             statusSpinner = document.getElementById('statusSpinner'),
-            outputSection = document.getElementById('outputSection'),
-            outputTitle = document.getElementById('outputTitle'),
+            readyCard = document.getElementById('readyCard'),
+            assessmentContainer = document.getElementById('assessmentContainer'),
             actions = document.getElementById('actions'),
             downloadBtn = document.getElementById('downloadBtn'),
             copyBtn = document.getElementById('copyBtn'),
@@ -615,9 +547,30 @@
             selectedFileName = document.getElementById('selectedFileName'),
             toast = document.getElementById('consensus-toast'),
             toastMsg = document.getElementById('toast-msg'),
-            toastIcon = document.getElementById('toast-icon');
+            toastIcon = document.getElementById('toast-icon'),
+            toggleRawBtn = document.getElementById('toggleRawBtn'),
+            toggleRawText = document.getElementById('toggleRawText');
 
-      let currentOutput = '';
+      // Assessment Elements
+      const assessmentBadge = document.getElementById('assessmentBadge'),
+            assessmentDate = document.getElementById('assessmentDate'),
+            assessmentFileRef = document.getElementById('assessmentFileRef'),
+            assessmentTitle = document.getElementById('assessmentTitle'),
+            assessmentPatientSummary = document.getElementById('assessmentPatientSummary'),
+            assessmentModeStatus = document.getElementById('assessmentModeStatus'),
+            assessmentVerdict = document.getElementById('assessmentVerdict'),
+            assessmentVerdictDetails = document.getElementById('assessmentVerdictDetails'),
+            verdictBadgeText = document.getElementById('verdictBadgeText'),
+            assessmentOverview = document.getElementById('assessmentOverview'),
+            assessmentKeyFindings = document.getElementById('assessmentKeyFindings'),
+            assessmentDiagnoses = document.getElementById('assessmentDiagnoses'),
+            assessmentMedications = document.getElementById('assessmentMedications'),
+            assessmentFollowUp = document.getElementById('assessmentFollowUp'),
+            nextActionsContainer = document.getElementById('nextActionsContainer'),
+            assessmentNextActions = document.getElementById('assessmentNextActions'),
+            topDossierRef = document.getElementById('topDossierRef');
+
+      let currentDownloadText = '';
       let downloadFileName = 'summary.txt';
       let chosenAction = 'summarize';
 
@@ -672,39 +625,148 @@
         fileSelectedBadge.classList.remove('hidden');
         fileSelectedBadge.classList.add('inline-flex');
         filePromptText.textContent = 'Selected Medical Document';
-        fileHelpText.textContent = 'Click to change file or proceed with synthesis below';
+        fileHelpText.textContent = 'Click to replace file or submit below';
       }
 
       // Track submit action
       summarizeBtn?.addEventListener('click', () => { chosenAction = 'summarize'; });
       evaluateBtn?.addEventListener('click', () => { chosenAction = 'evaluate'; });
 
+      // Toggle raw output
+      toggleRawBtn?.addEventListener('click', () => {
+        if (o.classList.contains('hidden')) {
+          o.classList.remove('hidden');
+          toggleRawText.textContent = 'Hide Raw Text';
+        } else {
+          o.classList.add('hidden');
+          toggleRawText.textContent = 'Show Raw Text';
+        }
+      });
+
+      // Client-side fallback parser for markdown blocks
+      function parseStructuredContent(raw, data) {
+        if (data && typeof data === 'object') return data;
+
+        const res = {
+          title: '',
+          verdict: '',
+          patient_summary: '',
+          overview: '',
+          key_findings: [],
+          diagnoses_conditions: [],
+          medications: [],
+          recommended_follow_up: '',
+          next_courses_of_action: ''
+        };
+
+        if (!raw) return res;
+
+        try {
+          const jsonMatch = raw.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || [null, raw];
+          const parsed = JSON.parse(jsonMatch[1].trim());
+          if (parsed && typeof parsed === 'object') return parsed;
+        } catch {}
+
+        const getSection = (namePattern) => {
+          const re = new RegExp(`\\*\\*\\s*(?:${namePattern})\\s*:\\s*\\*\\*\\s*([\\s\\S]*?)(?=\\n\\s*\\*\\*|$)`, 'i');
+          const m = raw.match(re);
+          return m ? m[1].trim() : '';
+        };
+
+        res.patient_summary = getSection('Patient Summary|Summary');
+        res.overview = getSection('Overview');
+        res.verdict = getSection('Verdict|Recommendation|Formal Verdict');
+        res.recommended_follow_up = getSection('Recommended Follow-up|Follow-up');
+        res.next_courses_of_action = getSection('Next courses of action|Next Courses of Action|Actions');
+
+        const parseList = (str) => {
+          if (!str) return [];
+          return str
+            .split(/\n+/)
+            .map(s => s.replace(/^\s*[-*•\d.]+\s*/, '').trim())
+            .filter(Boolean);
+        };
+
+        res.key_findings = parseList(getSection('Key Findings|Findings'));
+        res.diagnoses_conditions = parseList(getSection('Diagnoses/Conditions|Diagnoses|Conditions'));
+        res.medications = parseList(getSection('Medications|Medication|Treatments'));
+
+        if (!res.overview && !res.patient_summary) {
+          res.overview = raw;
+        }
+        return res;
+      }
+
+      // Generate clean exportable text
+      function formatPlainTextExport(data, fileName, action, mode) {
+        const title = data.title || `${action.toUpperCase()} REPORT: ${fileName}`;
+        const lines = [
+          `======================================================================`,
+          `AEVITASMED CLINICAL EVIDENCE ASSESSMENT`,
+          `======================================================================`,
+          `Document: ${fileName}`,
+          `Analysis Date: ${new Date().toLocaleString()}`,
+          `Mode: ${mode}`,
+          `Action: ${action.toUpperCase()}`,
+          `----------------------------------------------------------------------\n`,
+          `TITLE: ${title}\n`
+        ];
+
+        if (data.verdict) {
+          lines.push(`FORMAL VERDICT / RECOMMENDATION:\n${data.verdict}\n`);
+        }
+        if (data.patient_summary) {
+          lines.push(`PATIENT SUMMARY:\n${data.patient_summary}\n`);
+        }
+        if (data.overview) {
+          lines.push(`OVERVIEW:\n${data.overview}\n`);
+        }
+        if (data.key_findings && data.key_findings.length) {
+          lines.push(`KEY FINDINGS:`);
+          data.key_findings.forEach(f => lines.push(`  • ${f}`));
+          lines.push('');
+        }
+        if (data.diagnoses_conditions && data.diagnoses_conditions.length) {
+          lines.push(`DIAGNOSES / CONDITIONS:`);
+          data.diagnoses_conditions.forEach(d => lines.push(`  • ${d}`));
+          lines.push('');
+        }
+        if (data.medications && data.medications.length) {
+          lines.push(`MEDICATIONS:`);
+          data.medications.forEach(m => lines.push(`  • ${m}`));
+          lines.push('');
+        }
+        if (data.recommended_follow_up) {
+          lines.push(`RECOMMENDED FOLLOW-UP:\n${data.recommended_follow_up}\n`);
+        }
+        if (data.next_courses_of_action) {
+          lines.push(`NEXT COURSES OF ACTION:\n${data.next_courses_of_action}\n`);
+        }
+
+        lines.push(`----------------------------------------------------------------------`);
+        lines.push(`DISCLAIMER: AI-generated clinical assessment for clinician support.`);
+        lines.push(`For informational purposes only; not medical advice.`);
+        lines.push(`======================================================================`);
+        return lines.join('\n');
+      }
+
       // Form submission
       f.addEventListener('submit', async e => {
         e.preventDefault();
         const action = (e.submitter && e.submitter.value) || chosenAction || 'summarize';
+        const mode = (document.getElementById('mode')?.value || 'FAST').toUpperCase();
 
         // Update UI for loading state
         statusWrapper.classList.remove('hidden');
         statusSpinner.classList.remove('hidden');
         s.textContent = action === 'evaluate' ? 'Evaluating document against clinical criteria...' : 'Summarizing document via clinical AI...';
         s.className = 'font-label-md text-label-md text-primary flex-1 m-0';
-        
-        outputSection.classList.add('hidden');
-        actions.style.display = 'none';
-        o.textContent = '';
-        currentOutput = '';
 
         const file = pdfInput && pdfInput.files ? pdfInput.files[0] : null;
-        if (file && file.name) {
-          const baseName = file.name.replace(/\.[^/.]+$/, '');
-          downloadFileName = `${baseName}-${action}.txt`;
-        } else {
-          downloadFileName = `${action}.txt`;
-        }
+        const baseName = file && file.name ? file.name.replace(/\.[^/.]+$/, '') : 'document';
+        downloadFileName = `${baseName}-${action}.txt`;
 
         downloadBtn.textContent = action === 'evaluate' ? 'Download Evaluation' : 'Download Summary';
-        outputTitle.textContent = action === 'evaluate' ? 'Clinical Evaluation & Course of Action' : 'Executive Clinical Summary';
 
         const formData = new FormData(f);
         formData.set('action', action);
@@ -723,12 +785,91 @@
           }
 
           o.textContent = d.summary;
-          currentOutput = d.summary;
-          if (currentOutput) {
-            outputSection.classList.remove('hidden');
-            actions.style.display = 'flex';
-            showToast(action === 'evaluate' ? 'Evaluation complete' : 'Summary generated', 'verified');
+
+          // Parse structured JSON or markdown
+          const parsed = parseStructuredContent(d.summary, d.data);
+
+          // Render structured content into GRADE Standard Assessment styling
+          readyCard?.classList.add('hidden');
+          assessmentContainer?.classList.remove('hidden');
+
+          const now = new Date();
+          assessmentBadge.textContent = action === 'evaluate' ? 'GRADE Standard Clinical Evaluation' : 'GRADE Standard Clinical Summary';
+          assessmentDate.textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+          assessmentFileRef.textContent = `Protocol Ref: ${file ? file.name : 'Ingested Record'}`;
+          if (topDossierRef) topDossierRef.textContent = `#EVAL-${baseName.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12)}`;
+
+          assessmentTitle.textContent = parsed.title || (file ? `Clinical Evidence Memo: ${baseName}` : 'Clinical Evidence Consensus Memo');
+          assessmentPatientSummary.textContent = parsed.patient_summary || parsed.overview || 'Synthesized clinical appraisal for practitioner review.';
+
+          assessmentModeStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> ${mode} Engine`;
+
+          // Verdict Banner
+          verdictBadgeText.textContent = action === 'evaluate' ? 'Clinical Action Verdict' : 'Synthesis Recommendation';
+          assessmentVerdict.textContent = parsed.verdict || (action === 'evaluate' ? 'Clinical Evaluation & Course of Action' : 'Document Ingestion Complete');
+          assessmentVerdictDetails.textContent = parsed.next_courses_of_action || parsed.recommended_follow_up || parsed.patient_summary || '';
+
+          // Overview
+          assessmentOverview.textContent = parsed.overview || parsed.patient_summary || d.summary;
+
+          // Key Findings
+          assessmentKeyFindings.innerHTML = '';
+          const findingsList = Array.isArray(parsed.key_findings) && parsed.key_findings.length
+            ? parsed.key_findings
+            : (parsed.overview ? [parsed.overview] : ['No explicit key findings identified.']);
+
+          findingsList.forEach(finding => {
+            const card = document.createElement('div');
+            card.className = 'bg-surface-container-low rounded-lg p-space-md flex items-start gap-space-xs';
+            card.innerHTML = `
+              <span class="material-symbols-outlined text-primary text-[18px] mt-0.5 flex-shrink-0">check_circle</span>
+              <p class="font-body-sm text-body-sm text-on-surface leading-normal m-0">${finding}</p>
+            `;
+            assessmentKeyFindings.appendChild(card);
+          });
+
+          // Diagnoses / Conditions
+          assessmentDiagnoses.innerHTML = '';
+          const diagnosesList = Array.isArray(parsed.diagnoses_conditions) && parsed.diagnoses_conditions.length
+            ? parsed.diagnoses_conditions
+            : ['None explicitly specified'];
+
+          diagnosesList.forEach(diag => {
+            const chip = document.createElement('span');
+            chip.className = 'px-space-sm py-1 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-medium border border-primary/20';
+            chip.textContent = diag;
+            assessmentDiagnoses.appendChild(chip);
+          });
+
+          // Medications
+          assessmentMedications.innerHTML = '';
+          const medsList = Array.isArray(parsed.medications) && parsed.medications.length
+            ? parsed.medications
+            : ['None recorded in document'];
+
+          medsList.forEach(med => {
+            const chip = document.createElement('span');
+            chip.className = 'px-space-sm py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-medium border border-outline-variant/40';
+            chip.textContent = med;
+            assessmentMedications.appendChild(chip);
+          });
+
+          // Recommended Follow-up
+          assessmentFollowUp.textContent = parsed.recommended_follow_up || 'Routine clinical monitoring as standard of care.';
+
+          // Next Courses of Action
+          if (parsed.next_courses_of_action && parsed.next_courses_of_action.trim()) {
+            nextActionsContainer.classList.remove('hidden');
+            assessmentNextActions.textContent = parsed.next_courses_of_action;
+          } else {
+            nextActionsContainer.classList.add('hidden');
           }
+
+          // Format clean text export
+          currentDownloadText = formatPlainTextExport(parsed, file ? file.name : 'report.pdf', action, mode);
+
+          showToast(action === 'evaluate' ? 'Clinical evaluation synthesized' : 'Summary assessment generated', 'verified');
+          assessmentContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (err) {
           statusSpinner.classList.add('hidden');
           s.textContent = 'Error: ' + err.message;
@@ -739,8 +880,9 @@
 
       // Download Handler
       downloadBtn.addEventListener('click', () => {
-        if (!currentOutput) return;
-        const blob = new Blob([currentOutput], { type: 'text/plain;charset=utf-8' });
+        const textToSave = currentDownloadText || o.textContent;
+        if (!textToSave) return;
+        const blob = new Blob([textToSave], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -754,10 +896,11 @@
 
       // Copy Handler
       copyBtn?.addEventListener('click', async () => {
-        if (!currentOutput) return;
+        const textToCopy = currentDownloadText || o.textContent;
+        if (!textToCopy) return;
         try {
-          await navigator.clipboard.writeText(currentOutput);
-          showToast('Copied synthesis to clipboard', 'content_copy');
+          await navigator.clipboard.writeText(textToCopy);
+          showToast('Copied clinical assessment to clipboard', 'content_copy');
         } catch {
           showToast('Could not copy automatically', 'error');
         }
